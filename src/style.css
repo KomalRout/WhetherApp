@@ -1,0 +1,49 @@
+:root{
+primary-blue: hsl(243, 96%, 9%);
+secondary-blue: hsl(243, 27%, 20%);
+navy-blue: hsl(243, 23%, 24%);
+nav-blue: hsl(243, 23%, 30%);
+grey-1: hsl(240, 6%, 70%);
+grey-2: hsl(250, 6%, 84%);
+white-1: hsl(0, 0%, 100%);
+}
+*{
+    background-color: hsl(243, 96%, 9%);
+    color: white;
+}
+
+header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 0px 20px;
+}
+
+main{
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.search-bar{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+}
+
+.banner{
+    width: 500px;
+    height: 200px;
+    background-color: hsl(243, 27%, 20%);
+}
+
+.characteristics{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 500px;
+    border: 1px solid white;
+    height: 100px;
+    align-items: center;
+}

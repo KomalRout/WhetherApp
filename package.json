@@ -2,5 +2,23 @@
   "dependencies": {
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
-  }
+  },
+  "name": "weather-app",
+  "version": "1.0.0",
+  "description": "![Design preview for the Weather app coding challenge](./preview.jpg)",
+  "main": "index.html",
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.2",
+    "jest": "^30.1.3",
+    "vite": "^7.1.5",
+    "webpack": "^5.101.3",
+    "webpack-cli": "^6.0.1"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "author": "Komal Rout",
+  "license": "ISC"
 }
