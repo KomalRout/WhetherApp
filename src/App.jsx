@@ -4,11 +4,13 @@ const App = () => {
   return (
     <div>
       <header>
-        <h1>Weather Now</h1>
-        <p>Units</p>
+        <p className="logo-text">Weather Now</p>
+        <select name="Unit" id="unit-select">
+          <option>Switch to Imperial/Metric</option>
+        </select>
       </header>
       <main>
-        <h1>How's the sky looking today?</h1>
+        <p>How's the sky looking today?</p>
         <div className="search-bar">
           <input placeholder="Search"></input>
           <button>Search</button>
