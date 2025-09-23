@@ -13,7 +13,6 @@
 @font-face {
     font-family: 'BricolageGrotesque_Bold';
     src: local('BricolageGrotesque-Bold'),url('assets/fonts/Bricolage_Grotesque/static/BricolageGrotesque-Bold.ttf'), format('truetype');
-    font-weight: bold;
 }
 
 @font-face {
@@ -42,4 +41,5 @@
 *{
     background-color: var(--neutral-900);
     color: white;
+    font-family: 'DM_Sans_Medium';
 }

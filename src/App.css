@@ -1,0 +1,99 @@
+@import 'main.css';
+
+header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    margin: 20px 40px;
+}
+
+
+.unit-select{
+    width: 120px;
+}
+.title-container{
+    justify-items: center;
+}
+
+.title{
+    font-family: 'BricolageGrotesque_Bold';
+    font-size: 52px;
+}
+
+.content-container{
+    gap: 48px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    margin: 20px;
+}
+
+.search-container{
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    color: var(--neutral-0);
+}
+.search-input{
+    background-color: var(--neutral-800);
+    border: none;
+    border-radius: 5px;
+    height: 45px;
+    width: 500px;
+    padding: 16px 24px;
+}
+
+.search-btn{
+    background-color: var(--blue-500);
+    height: 45px;
+    width: 114px;
+    border-radius: 5px;
+    border: var(--blue-500);
+}
+
+.weather-info{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    width: 800px;
+    height: 286px;
+}
+
+.location-info{
+    position: absolute;
+    width: 458px;
+    height: 64px;
+    background-color: transparent;
+    transform: translate(30px,65px);
+}
+
+.location-info>p{
+    font-family: 'DM_Sans_Bold';
+    line-height: 120%;
+    background-color: transparent;  
+    font-size: 28px ;
+}
+
+.temperature-info{
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    width: 294px;
+    height: 120px;
+    background-color: transparent;
+    transform: translate(482px,83px);
+    align-items: center;
+}
+.temperature-info>p{
+    font-family: 'DM_Sans_SemiBoldItalic';
+    font-size: 96px;
+    line-height: 100%;
+    background-color: transparent;  
+}
+
+.temperature-info>img{
+    width: 120px;
+    height: 120px;
+    background-color: transparent;  
+}
