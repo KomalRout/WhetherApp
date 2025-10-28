@@ -1,15 +1,7 @@
-import {
-  FormControl,
-  Grid,
-  Input,
-  InputLabel,
-  MenuItem,
-  Select,
-  Typography,
-} from "@mui/material";
-import React from "react";
+import React, { createContext, useState } from "react";
 import "./App.css";
 import Dropdown from "./components/Dropdown";
+import Search from "./components/Search/Search";
 
 const App = () => {
   const unit_options = [
@@ -128,16 +120,7 @@ const App = () => {
         <p className="title">How's the sky looking today?</p>
       </div>
       <main className="main-content-container">
-        <div className="search-container">
-          <input
-            id="search-input"
-            name="search-input"
-            className="search-input"
-            type="search"
-            placeholder="Search for a place..."
-          />
-          <button className="search-btn">Search</button>
-        </div>
+        <Search />
         <div className="content-container">
           <div className="left-content">
             {/* Weather Information Section */}
