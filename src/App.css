@@ -201,3 +201,27 @@ header {
   position: absolute;
   right: 16px;
 }
+
+.search-dropdown {
+  width: 526px;
+  height: 184px;
+  background-color: var(--neutral-800);
+  position: absolute;
+  gap: 4px;
+  display: flex;
+  border-radius: 12px;
+  transform: translate(1px, 10px);
+  z-index: 1;
+  overflow-y: auto;
+  flex-direction: column;
+}
+
+.search-loader {
+  height: 55px;
+}
+
+.search-item {
+  background-color: none;
+  padding: 8px;
+  list-style: none;
+}
