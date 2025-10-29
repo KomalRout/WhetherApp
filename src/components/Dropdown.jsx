@@ -1,7 +1,7 @@
 import React from "react";
 import "./Dropdown.css";
 
-const Dropdown = ({ options, label, icon }) => {
+const Dropdown = ({ options, label, icon, onChange }) => {
   return (
     <div className="select-wrapper">
       {/* <label className="select-label">
@@ -9,11 +9,18 @@ const Dropdown = ({ options, label, icon }) => {
         Unit
       </label> */}
 
-      <select className="custom-select">
-        <option value="">Unit</option>
-        <option value="kg">Kilograms (kg)</option>
-        <option value="lb">Pounds (lb)</option>
-        <option value="g">Grams (g)</option>
+      <select
+        id={`${label}-select`}
+        className="custom-select"
+        onChange={(event) => {
+          onChange(event.target.value);
+        }}
+      >
+        {options.map((option, index) => (
+          <option key={`${option.key}+${index}`} value={option.key}>
+            {option.label}
+          </option>
+        ))}
       </select>
     </div>
   );

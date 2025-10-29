@@ -7,7 +7,7 @@ export const fetchWeatherData = async (location) => {
     latitude: latitude,
     longitude: longitude,
     daily: ["temperature_2m_min", "temperature_2m_max", "weather_code"],
-    hourly: "temperature_2m",
+    hourly: ["temperature_2m", "weather_code"],
     current: [
       "wind_speed_10m",
       "precipitation",
@@ -22,9 +22,62 @@ export const fetchWeatherData = async (location) => {
     ],
   };
   const url = "https://api.open-meteo.com/v1/forecast";
-  const response = await fetchWeatherApi(url, params).then((res) => res);
-  const data = await response.json();
-  return data;
+  const responses = await fetchWeatherApi(url, params).then((res) => res);
+  const data = responses[0] ?? null;
+  const utcOffsetSeconds = data.utcOffsetSeconds();
+  const current = data.current();
+  const hourly = data.hourly();
+  const daily = data.daily();
+
+  const weatherData = {
+    current: {
+      time: new Date((Number(current.time()) + utcOffsetSeconds) * 1000),
+      wind_speed_10m: current.variables(0).value(),
+      precipitation: current.variables(1).value(),
+      relative_humidity_2m: current.variables(2).value(),
+      apparent_temperature: current.variables(3).value(),
+      temperature_2m: current.variables(4).value(),
+      is_day: current.variables(5).value(),
+      weather_code: current.variables(6).value(),
+      rain: current.variables(7).value(),
+      showers: current.variables(8).value(),
+      snowfall: current.variables(9).value(),
+    },
+    hourly: {
+      time: [
+        ...Array(
+          (Number(hourly.timeEnd()) - Number(hourly.time())) / hourly.interval()
+        ),
+      ].map((_, i) =>
+        new Date(
+          (Number(hourly.time()) + i * hourly.interval() + utcOffsetSeconds) *
+            1000
+        ).toLocaleTimeString("en-US", {
+          hour: "numeric",
+          hour12: true,
+          weekday: "short",
+        })
+      ),
+      temperature: Array.from(hourly.variables(0).valuesArray()),
+      weather_code: Array.from(hourly.variables(1).valuesArray()),
+    },
+    daily: {
+      time: [
+        ...Array(
+          (Number(daily.timeEnd()) - Number(daily.time())) / daily.interval()
+        ),
+      ].map((_, i) =>
+        new Date(
+          (Number(daily.time()) + i * daily.interval() + utcOffsetSeconds) *
+            1000
+        ).toLocaleDateString("en-US", { weekday: "short" })
+      ),
+      temperature_min: Array.from(daily.variables(0).valuesArray()),
+      temperature_max: Array.from(daily.variables(1).valuesArray()),
+      weather_code: Array.from(daily.variables(2).valuesArray()),
+    },
+  };
+  return weatherData;
 };
 
 export const fetchLocationData = async (query) => {
@@ -32,7 +85,7 @@ export const fetchLocationData = async (query) => {
   const response = await axios(url).then((res) => {
     return res.data.results;
   });
-  let processedData = (response ?? []).map((item) => {
+  let processedData = (response ?? []).map((item, index) => {
     let last_admin_index = Object.entries(item)?.reduce((acc, [key, value]) => {
       if (key.startsWith("admin")) {
         let index = parseInt(key.replace("admin", ""));
