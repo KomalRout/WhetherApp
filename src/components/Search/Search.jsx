@@ -8,6 +8,7 @@ const Search = () => {
   const [searchValue, setSearchValue] = useState("");
   const [data, setData] = useState(new Set());
   const dispatch = useDispatch();
+
   const handleOnChangeValue = (e) => {
     let value = e.target.value;
     setSearchValue(value?.trim() || "");

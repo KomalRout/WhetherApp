@@ -19,13 +19,15 @@
 }
 
 .custom-select {
-  width: 100%;
+  width: 120px;
+  height: 37px;
   padding: 10px 12px;
   font-size: 16px;
   color: #333;
-  border: 1px solid #ccc;
-  border-radius: 12px;
+  border: 1px solid var(--neutral-600);
+  border-radius: 8px;
   background: #fff;
+  padding: 8px 16px;
 
   /* remove default arrow */
   -webkit-appearance: none;
@@ -37,15 +39,22 @@
 
 /* add custom arrow */
 .custom-select {
-  background-image: url("data:image/svg+xml;utf8,<svg fill='%23666' height='14' viewBox='0 0 24 24' width='14' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-image: url("../../public/assets/images/icon-dropdown.svg");
   background-repeat: no-repeat;
   background-position: right 12px center;
   background-size: 14px;
-  padding-right: 36px; /* leave room for arrow */
+  background-color: var(--neutral-600);
+  color: var(--neutral-0);
+  padding-right: 36px;
 }
 
 .custom-select:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+select option {
+  background: var(--neutral-800);
+  color: var(--neutral-0);
 }

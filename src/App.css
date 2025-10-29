@@ -225,3 +225,10 @@ header {
   padding: 8px;
   list-style: none;
 }
+
+.hourly-forcast-content {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

@@ -1,9 +1,18 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import "./App.css";
 import Dropdown from "./components/Dropdown";
 import Search from "./components/Search/Search";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchWeatherData } from "./service";
+import {
+  setCurrentWeatherInfo,
+  setDailyForcast,
+  setHourlyForcast,
+} from "./reducers/appSlice";
+import WMOInterpretation from "./components/WMOInterpretation/WMOInterpretation";
 
 const App = () => {
+  const dispatch = useDispatch();
   const unit_options = [
     { value: "celsius", label: "Celsius", icon: "assets/images/celsius.svg" },
     {
@@ -73,29 +82,32 @@ const App = () => {
 
   const hourly_forcast = [
     {
-      time_stamp: "3 PM",
-      icon: "public/assets/images/icon-sunny.webp",
-      temp: "22°",
+      key: "Mon",
+      label: "Monday",
     },
     {
-      time_stamp: "3 PM",
-      icon: "public/assets/images/icon-sunny.webp",
-      temp: "22°",
+      key: "Tue",
+      label: "Tuesday",
     },
     {
-      time_stamp: "3 PM",
-      icon: "public/assets/images/icon-sunny.webp",
-      temp: "22°",
+      key: "Wed",
+      label: "Wednesday",
     },
     {
-      time_stamp: "3 PM",
-      icon: "public/assets/images/icon-sunny.webp",
-      temp: "22°",
+      key: "Thu",
+      label: "Thursday",
     },
     {
-      time_stamp: "3 PM",
-      icon: "public/assets/images/icon-sunny.webp",
-      temp: "22°",
+      key: "Fri",
+      label: "Friday",
+    },
+    {
+      key: "Sat",
+      label: "Saturday",
+    },
+    {
+      key: "Sun",
+      label: "Sunday",
     },
   ];
   const InputPlaceholder = () => {
@@ -106,6 +118,33 @@ const App = () => {
       </>
     );
   };
+
+  const [filteredHourlyForcast, setFilteredHourlyForcast] = useState([]);
+
+  const state = useSelector((state) => state.appReducer);
+  const dailyForcast = state.dailyForcast;
+  const hourlyForcast = state.hourlyForcast;
+
+  const onDaySelect = (day) => {
+    const filteredData = hourlyForcast.filter((item) => item.key === day);
+    setFilteredHourlyForcast(filteredData);
+  };
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(async () => {
+      if (state.latitude !== "" || state.longitude !== "") {
+        let weatherData = await fetchWeatherData([
+          state.longitude,
+          state.latitude,
+        ]);
+
+        dispatch(setDailyForcast(weatherData.daily));
+        dispatch(setHourlyForcast(weatherData.hourly));
+        dispatch(setCurrentWeatherInfo(weatherData.current));
+      }
+    }, 500);
+    return () => clearTimeout(delayDebounceFn);
+  }, [state.latitude, state.longitude]);
+
   return (
     <div>
       <header>
@@ -154,31 +193,40 @@ const App = () => {
             <div className="daily-forcast">
               <p>Daily Forcast</p>
               <div className="forcast-details">
-                {daily_forcast.map((day) => (
-                  <div className="forcast-item card-item" key={day.day}>
-                    <p>{day.day}</p>
-                    <img src={day.icon} alt={`${day.day}-icon`} />
-                    <div className="temp-range">
-                      <p>{day.max_temp}</p>
-                      <p>{day.min_temp}</p>
+                {dailyForcast.map((daily) => {
+                  return (
+                    <div className="forcast-item card-item">
+                      <p>{daily.day}</p>
+                      <WMOInterpretation code={daily.weather_code} />
+                      <div className="temp-range">
+                        <p>{daily.temperature_max + "°"}</p>
+                        <p>{daily.temperature_min + "°"}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
+          {/* Hourly Forcast Section */}
           <div className="hourly-forecast">
             <div className="hourly-forecast-header">
               <p>Hourly Forecast</p>
-              <Dropdown options={week_options} />
+              <Dropdown
+                options={hourly_forcast}
+                label={"hourly_forcast"}
+                onChange={(value) => onDaySelect(value)}
+              />
             </div>
-            {hourly_forcast?.map((item) => (
-              <div className="hourly-forcast-item">
-                <img src={item.icon} />
-                <p>{item.time_stamp}</p>
-                <p>{item.temp}</p>
-              </div>
-            ))}
+            <div className="hourly-forcast-content">
+              {filteredHourlyForcast?.map((item) => (
+                <div className="hourly-forcast-item">
+                  <WMOInterpretation code={item.weather_code} />
+                  <p>{item.time_stamp}</p>
+                  <p>{`${item.temperature}+°`}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </main>
