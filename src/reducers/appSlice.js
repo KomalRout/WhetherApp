@@ -2,6 +2,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+  locationSelected: "",
   longitude: "",
   latitude: "",
   selectedCity: "",
@@ -14,6 +15,9 @@ export const appSlice = createSlice({
   name: "app",
   initialState,
   reducers: {
+    setLocation: (state, action) => {
+      state.locationSelected = action.payload;
+    },
     setLatLong: (state, action) => {
       state.longitude = action.payload.longitude;
       state.latitude = action.payload.latitude;
@@ -48,6 +52,7 @@ export const appSlice = createSlice({
 });
 
 export const {
+  setLocation,
   setLatLong,
   setHourlyForcast,
   setDailyForcast,

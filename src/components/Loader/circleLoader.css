@@ -1,0 +1,23 @@
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  position: relative;
+  margin: 4px;
+  animation: spin 1s linear infinite;
+  -webkit-animation: spin 1s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

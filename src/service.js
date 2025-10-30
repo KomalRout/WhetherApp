@@ -14,11 +14,7 @@ export const fetchWeatherData = async (location) => {
       "relative_humidity_2m",
       "apparent_temperature",
       "temperature_2m",
-      "is_day",
       "weather_code",
-      "rain",
-      "showers",
-      "snowfall",
     ],
   };
   const url = "https://api.open-meteo.com/v1/forecast";
@@ -31,17 +27,20 @@ export const fetchWeatherData = async (location) => {
 
   const weatherData = {
     current: {
-      time: new Date((Number(current.time()) + utcOffsetSeconds) * 1000),
-      wind_speed_10m: current.variables(0).value(),
+      time: new Date(
+        (Number(current.time()) + utcOffsetSeconds) * 1000
+      ).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        weekday: "long",
+      }),
+      windSpeed: Math.round(current.variables(0).value()),
       precipitation: current.variables(1).value(),
-      relative_humidity_2m: current.variables(2).value(),
-      apparent_temperature: current.variables(3).value(),
-      temperature_2m: current.variables(4).value(),
-      is_day: current.variables(5).value(),
+      humidity: current.variables(2).value(),
+      apparent_temperature: Math.round(current.variables(3).value()),
+      temperature: Math.round(current.variables(4).value()),
       weather_code: current.variables(6).value(),
-      rain: current.variables(7).value(),
-      showers: current.variables(8).value(),
-      snowfall: current.variables(9).value(),
     },
     hourly: {
       time: [
@@ -86,6 +85,7 @@ export const fetchLocationData = async (query) => {
     return res.data.results;
   });
   let processedData = (response ?? []).map((item, index) => {
+    response;
     let last_admin_index = Object.entries(item)?.reduce((acc, [key, value]) => {
       if (key.startsWith("admin")) {
         let index = parseInt(key.replace("admin", ""));
@@ -93,7 +93,7 @@ export const fetchLocationData = async (query) => {
       }
       return acc;
     }, 0);
-
+    console.log("last_admin_index", last_admin_index);
     let name = "";
     if (last_admin_index === 0) {
       name = item["country"];
@@ -101,10 +101,12 @@ export const fetchLocationData = async (query) => {
       while (last_admin_index > 0) {
         let admin_key = `admin${last_admin_index}`;
         if (item[admin_key]) {
-          name += `${item[admin_key]}`;
+          name =
+            name === "" ? `${item[admin_key]}` : `${name}, ${item[admin_key]}`;
         }
         last_admin_index--;
       }
+      name = name + `, ${item["country"]}`;
     }
 
     return {
