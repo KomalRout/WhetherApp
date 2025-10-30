@@ -22,64 +22,6 @@ const App = () => {
     },
   ];
 
-  const temperature_details = [
-    { label: "Feels Like", value: "18°" },
-    { label: "Humidity", value: "60%" },
-    { label: "Wind", value: "10 km/h" },
-    { label: "Precipitation", value: "20%" },
-  ];
-
-  const daily_forcast = [
-    {
-      day: "Wed",
-      icon: "public/assets/images/icon-sunny.webp",
-      max_temp: "22°",
-      min_temp: "15°",
-    },
-    {
-      day: "Thu",
-      icon: "public/assets/images/icon-snow.webp",
-      max_temp: "19°",
-      min_temp: "14°",
-    },
-    {
-      day: "Fri",
-      icon: "public/assets/images/icon-rain.webp",
-      max_temp: "21°",
-      min_temp: "16°",
-    },
-    {
-      day: "Sat",
-      icon: "public/assets/images/icon-partly-cloudy.webp",
-      max_temp: "23°",
-      min_temp: "17°",
-    },
-    {
-      day: "Sun",
-      icon: "public/assets/images/icon-sunny.webp",
-      max_temp: "24°",
-      min_temp: "18°",
-    },
-    {
-      day: "Mon",
-      icon: "public/assets/images/icon-storm.webp",
-      max_temp: "20°",
-      min_temp: "15°",
-    },
-    {
-      day: "Tue",
-      icon: "public/assets/images/icon-storm.webp",
-      max_temp: "21°",
-      min_temp: "16°",
-    },
-  ];
-
-  const week_options = [
-    { label: "Monday", value: "Mon", id: "Mon" },
-    { label: "Monday", value: "Mon", id: "Mon" },
-    { label: "Monday", value: "Mon", id: "Mon" },
-  ];
-
   const hourly_forcast = [
     {
       key: "Mon",
@@ -124,6 +66,17 @@ const App = () => {
   const state = useSelector((state) => state.appReducer);
   const dailyForcast = state.dailyForcast;
   const hourlyForcast = state.hourlyForcast;
+  const currentForcast = state.currentWeatherInfo;
+  const location = state.locationSelected;
+
+  let feelsLike = currentForcast.apparent_temperature
+    ? currentForcast.apparent_temperature + "°"
+    : "_";
+  let humidity = currentForcast.humidity ? currentForcast.humidity + "%" : "_";
+  let wind = currentForcast.windSpeed ? currentForcast.windSpeed + "km/h" : "_";
+  let precipitation = currentForcast.precipitation
+    ? currentForcast.precipitation + "%"
+    : "_";
 
   const onDaySelect = (day) => {
     const filteredData = hourlyForcast.filter((item) => item.key === day);
@@ -169,25 +122,35 @@ const App = () => {
                 alt="weather_bg_large"
               />
               <div className="location-info">
-                <p>Berlin,Germany</p>
-                <p>Tuesday, Aug 5, 2025</p>
+                <p>{location}</p>
+                <p>{currentForcast.time}</p>
               </div>
               <div className="temperature-info">
                 <img
                   src="public/assets/images/icon-sunny.webp"
                   alt="sunny-icon"
                 />
-                <p>20</p>
+                <p>{currentForcast.temperature + "°"}</p>
               </div>
             </div>
             {/* Temperature Details Section */}
             <div className="temperature-details">
-              {temperature_details.map((detail) => (
-                <div className="detail-item card-item" key={detail.label}>
-                  <p>{detail.label}</p>
-                  <p>{detail.value}</p>
-                </div>
-              ))}
+              <div className="detail-item card-item">
+                <p>Feels Like</p>
+                <p>{feelsLike}</p>
+              </div>
+              <div className="detail-item card-item">
+                <p>Humidity</p>
+                <p>{humidity}</p>
+              </div>
+              <div className="detail-item card-item">
+                <p>Wind</p>
+                <p>{wind}</p>
+              </div>
+              <div className="detail-item card-item">
+                <p>Precipitation</p>
+                <p>{precipitation}</p>
+              </div>
             </div>
             {/* Daily Forcast Section */}
             <div className="daily-forcast">
@@ -223,7 +186,7 @@ const App = () => {
                 <div className="hourly-forcast-item">
                   <WMOInterpretation code={item.weather_code} />
                   <p>{item.time_stamp}</p>
-                  <p>{`${item.temperature}+°`}</p>
+                  <p>{`${item.temperature}°`}</p>
                 </div>
               ))}
             </div>

@@ -1,8 +1,9 @@
-import axios from "axios";
-import React, { use, useEffect, useState } from "react";
-import { setLatLong } from "../../reducers/appSlice";
+import "./search.css";
+import { use, useEffect, useState } from "react";
+import { setLatLong, setLocation } from "../../reducers/appSlice";
 import { useDispatch } from "react-redux";
 import { fetchLocationData } from "../../service";
+import CircleLoader from "../Loader/CircleLoader";
 
 const Search = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -18,6 +19,7 @@ const Search = () => {
     dispatch(setLatLong({ longitude: item.long, latitude: item.lat }));
     setData(new Set());
     setSearchValue("");
+    dispatch(setLocation(item.name));
   };
 
   useEffect(() => {
@@ -65,7 +67,12 @@ const Search = () => {
                 </li>
               ))
             ) : (
-              <p key={"search_in_progress"}>Search in progress...</p>
+              <p className="search-progress" key="search_in_progress">
+                <span>
+                  <CircleLoader />
+                </span>
+                <span>Search in progress...</span>
+              </p>
             )}
           </div>
         ) : (
