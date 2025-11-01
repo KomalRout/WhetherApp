@@ -51,6 +51,18 @@ header {
   height: 286px;
 }
 
+.current-weather-loader {
+  width: 800px;
+  height: 286px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 20px;
+  gap: 5px;
+  align-items: center;
+  background-color: var(--neutral-700);
+}
+
 .location-info {
   position: absolute;
   width: 458px;
@@ -115,6 +127,28 @@ header {
   font-family: "DM_Sans_Medium";
   border-radius: 12px;
   opacity: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.loading {
+  background: linear-gradient(
+    90deg,
+    var(--neutral-600) 25%,
+    var(--neutral-700) 37%,
+    var(--neutral-800) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  color: transparent;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
 }
 
 .forcast-item {

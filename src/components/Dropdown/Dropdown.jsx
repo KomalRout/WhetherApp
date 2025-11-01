@@ -1,7 +1,7 @@
 import React from "react";
 import "./Dropdown.css";
 
-const Dropdown = ({ options, label, icon, onChange }) => {
+const Dropdown = ({ options, label, icon, onChange, ...props }) => {
   return (
     <div className="select-wrapper">
       {/* <label className="select-label">
@@ -17,7 +17,11 @@ const Dropdown = ({ options, label, icon, onChange }) => {
         }}
       >
         {options.map((option, index) => (
-          <option key={`${option.key}+${index}`} value={option.key}>
+          <option
+            key={`${option.key}+${index}`}
+            value={option.key}
+            selected={option.key === props.todaysDay}
+          >
             {option.label}
           </option>
         ))}

@@ -1,4 +1,4 @@
-.loader-container {
+.circle-loader-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -19,5 +19,44 @@
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+.linear-loader {
+  width: 79px;
+  height: 16px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.dot {
+  width: 15px;
+  height: 15px;
+  background-color: var(--neutral-200);
+  border-radius: 50%;
+  display: inline-block;
+  margin: 0 5px;
+  animation: bounce 1.5s infinite;
+}
+
+.dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s; /* Delay for the second dot */
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s; /* Delay for the third dot */
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0); /* Start and end at original position */
+  }
+  50% {
+    transform: translateY(-20px); /* Bounce upwards */
   }
 }
