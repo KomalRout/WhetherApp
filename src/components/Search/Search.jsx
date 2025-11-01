@@ -3,7 +3,7 @@ import { use, useEffect, useState } from "react";
 import { setLatLong, setLocation } from "../../reducers/appSlice";
 import { useDispatch } from "react-redux";
 import { fetchLocationData } from "../../service";
-import CircleLoader from "../Loader/CircleLoader";
+import { CircleLoader } from "../Loader/Loader";
 
 const Search = () => {
   const [searchValue, setSearchValue] = useState("");

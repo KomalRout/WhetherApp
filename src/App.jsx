@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
 import "./App.css";
-import Dropdown from "./components/Dropdown";
+import Dropdown from "./components/Dropdown/Dropdown";
 import Search from "./components/Search/Search";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchWeatherData } from "./service";
@@ -10,6 +10,7 @@ import {
   setHourlyForcast,
 } from "./reducers/appSlice";
 import WMOInterpretation from "./components/WMOInterpretation/WMOInterpretation";
+import { LinearLoader } from "./components/Loader/Loader";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -52,6 +53,11 @@ const App = () => {
       label: "Sunday",
     },
   ];
+
+  const todaysDay = new Date().toLocaleDateString("en-US", {
+    weekday: "short",
+  });
+
   const InputPlaceholder = () => {
     return (
       <>
@@ -117,21 +123,30 @@ const App = () => {
           <div className="left-content">
             {/* Weather Information Section */}
             <div className="weather-info">
-              <img
-                src="assets/images/bg-today-large.svg"
-                alt="weather_bg_large"
-              />
-              <div className="location-info">
-                <p>{location}</p>
-                <p>{currentForcast.time}</p>
-              </div>
-              <div className="temperature-info">
-                <img
-                  src="public/assets/images/icon-sunny.webp"
-                  alt="sunny-icon"
-                />
-                <p>{currentForcast.temperature + "°"}</p>
-              </div>
+              {Object.keys(currentForcast)?.length > 0 ? (
+                <>
+                  <img
+                    src="assets/images/bg-today-large.svg"
+                    alt="weather_bg_large"
+                  />
+                  <div className="location-info">
+                    <p>{location}</p>
+                    <p>{currentForcast.time}</p>
+                  </div>
+                  <div className="temperature-info">
+                    <img
+                      src="public/assets/images/icon-sunny.webp"
+                      alt="sunny-icon"
+                    />
+                    <p>{currentForcast.temperature + "°"}</p>
+                  </div>
+                </>
+              ) : (
+                <div className="current-weather-loader">
+                  <LinearLoader />
+                  <p>Loading...</p>
+                </div>
+              )}
             </div>
             {/* Temperature Details Section */}
             <div className="temperature-details">
@@ -156,15 +171,29 @@ const App = () => {
             <div className="daily-forcast">
               <p>Daily Forcast</p>
               <div className="forcast-details">
-                {dailyForcast.map((daily) => {
+                {(dailyForcast?.length > 0
+                  ? dailyForcast
+                  : Array.from({ length: 5 })
+                ).map((daily, index) => {
                   return (
-                    <div className="forcast-item card-item">
-                      <p>{daily.day}</p>
-                      <WMOInterpretation code={daily.weather_code} />
-                      <div className="temp-range">
-                        <p>{daily.temperature_max + "°"}</p>
-                        <p>{daily.temperature_min + "°"}</p>
-                      </div>
+                    <div
+                      key={`daily-forcast-${index}`}
+                      className={`forcast-item card-item ${
+                        !daily ? "loading" : ""
+                      }`}
+                    >
+                      {daily ? (
+                        <>
+                          <p>{daily.day}</p>
+                          <WMOInterpretation code={daily.weather_code} />
+                          <div className="temp-range">
+                            <p>{daily.temperature_max + "°"}</p>
+                            <p>{daily.temperature_min + "°"}</p>
+                          </div>
+                        </>
+                      ) : (
+                        <></>
+                      )}
                     </div>
                   );
                 })}
@@ -176,19 +205,33 @@ const App = () => {
             <div className="hourly-forecast-header">
               <p>Hourly Forecast</p>
               <Dropdown
-                options={hourly_forcast}
+                options={hourlyForcast.length > 0 ? hourly_forcast : ["_"]}
                 label={"hourly_forcast"}
                 onChange={(value) => onDaySelect(value)}
+                todaysDay={todaysDay}
               />
             </div>
             <div className="hourly-forcast-content">
-              {filteredHourlyForcast?.map((item) => (
-                <div className="hourly-forcast-item">
-                  <WMOInterpretation code={item.weather_code} />
-                  <p>{item.time_stamp}</p>
-                  <p>{`${item.temperature}°`}</p>
-                </div>
-              ))}
+              {(hourlyForcast.length > 0
+                ? filteredHourlyForcast
+                : Array.from({ length: 10 })
+              )?.map((item) => {
+                return (
+                  <div
+                    className={`hourly-forcast-item ${!item ? "loading" : ""}`}
+                  >
+                    {item ? (
+                      <>
+                        <WMOInterpretation code={item.weather_code} />
+                        <p>{item.time_stamp}</p>
+                        <p>{`${item.temperature}°`}</p>
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
