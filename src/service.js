@@ -36,7 +36,7 @@ export const fetchWeatherData = async (location) => {
         weekday: "long",
       }),
       windSpeed: Math.round(current.variables(0).value()),
-      precipitation: current.variables(1).value(),
+      precipitation: parseFloat(current.variables(1).value()).toFixed(1),
       humidity: current.variables(2).value(),
       apparent_temperature: Math.round(current.variables(3).value()),
       temperature: Math.round(current.variables(4).value()),

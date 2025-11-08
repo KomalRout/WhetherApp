@@ -11,17 +11,73 @@ import {
 } from "./reducers/appSlice";
 import WMOInterpretation from "./components/WMOInterpretation/WMOInterpretation";
 import { LinearLoader } from "./components/Loader/Loader";
+import { transformWithEsbuild } from "vite";
 
 const App = () => {
   const dispatch = useDispatch();
   const unit_options = [
-    { value: "celsius", label: "Celsius", icon: "assets/images/celsius.svg" },
     {
-      value: "fahrenheit",
-      label: "Fahrenheit",
-      icon: "assets/images/fahrenheit.svg",
+      key: "imperial",
+      label: "Switch to Imperial",
+      selected: false,
+      imperial: ["fehrenheit", "mph", "in"],
+    },
+    {
+      key: "metric",
+      label: "Switch to Metric",
+      selected: true,
+      metric: ["celsius", "kmh", "mm"],
+    },
+    {
+      group: "temperature",
+      groupLabel: "Temperature",
+      options: [
+        {
+          key: "celsius",
+          label: "Celsius (°C)",
+          selected: transformWithEsbuild,
+        },
+        {
+          key: "fehrenheit",
+          label: "Fehrenheit (°F)",
+          selected: false,
+        },
+      ],
+    },
+    {
+      group: "windSpeed",
+      groupLabel: "Wind Speed",
+      options: [
+        {
+          key: "kmh",
+          label: "Kilometers per hour (km/h)",
+          selected: true,
+        },
+        {
+          key: "mph",
+          label: "Miles per hour (mph)",
+          selected: false,
+        },
+      ],
+    },
+    {
+      group: "precipitation",
+      groupLabel: "Precipitation",
+      options: [
+        {
+          key: "mm",
+          label: "Millimeters (mm)",
+          selected: true,
+        },
+        {
+          key: "inches",
+          label: "Inches (in)",
+          selected: false,
+        },
+      ],
     },
   ];
+  const [unit, setUnit] = useState([]);
 
   const hourly_forcast = [
     {
@@ -88,6 +144,12 @@ const App = () => {
     const filteredData = hourlyForcast.filter((item) => item.key === day);
     setFilteredHourlyForcast(filteredData);
   };
+
+  const onUnitChange = (val = "metric") => {
+    let modified = unit_options?.filter((item) => item.key !== val);
+    setUnit(modified);
+  };
+
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
       if (state.latitude !== "" || state.longitude !== "") {
@@ -101,6 +163,9 @@ const App = () => {
         dispatch(setCurrentWeatherInfo(weatherData.current));
       }
     }, 500);
+    debugger;
+    onUnitChange();
+    onDaySelect(todaysDay);
     return () => clearTimeout(delayDebounceFn);
   }, [state.latitude, state.longitude]);
 
@@ -109,8 +174,9 @@ const App = () => {
       <header>
         <img src="assets/images/logo.svg" />
         <Dropdown
-          options={unit_options}
+          options={unit}
           label={"Unit"}
+          onChange={(val) => onUnitChange(val)}
           icon={"assets/images/icon-units.svg"}
         />
       </header>
@@ -205,8 +271,7 @@ const App = () => {
             <div className="hourly-forecast-header">
               <p>Hourly Forecast</p>
               <Dropdown
-                options={hourlyForcast.length > 0 ? hourly_forcast : ["_"]}
-                label={"hourly_forcast"}
+                options={hourlyForcast.length > 0 ? hourly_forcast : []}
                 onChange={(value) => onDaySelect(value)}
                 todaysDay={todaysDay}
               />

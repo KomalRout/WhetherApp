@@ -58,3 +58,8 @@ select option {
   background: var(--neutral-800);
   color: var(--neutral-0);
 }
+
+.unitStyling {
+  display: flex;
+  justify-content: space-around;
+}
