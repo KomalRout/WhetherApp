@@ -133,7 +133,7 @@ header {
 .loading {
   background: linear-gradient(
     90deg,
-    var(--neutral-600) 25%,
+    var(--neutral-800) 25%,
     var(--neutral-700) 37%,
     var(--neutral-800) 63%
   );

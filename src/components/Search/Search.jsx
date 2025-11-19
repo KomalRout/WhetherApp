@@ -49,7 +49,7 @@ const Search = () => {
           onChange={(e) => handleOnChangeValue(e)}
         />
         {searchValue !== "" ? (
-          <div
+          <ul
             className={
               data?.length > 0
                 ? "search-dropdown"
@@ -74,7 +74,7 @@ const Search = () => {
                 <span>Search in progress...</span>
               </p>
             )}
-          </div>
+          </ul>
         ) : (
           <></>
         )}

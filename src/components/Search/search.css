@@ -23,19 +23,17 @@
 
 .search-dropdown {
   width: 500px;
-  height: 184px;
-  display: flex;
-  flex-direction: column;
+  height: 280px;
   background-color: var(--neutral-800);
   position: absolute;
-  gap: 2px;
-  display: flex;
   border-radius: 12px;
-  transform: translate(1px, 10px);
+  transform: translate(1px, -5px);
   z-index: 1;
   overflow-y: auto;
+  display: flex;
   flex-direction: column;
-  justify-content: center;
+  padding: 10px;
+  gap: 10px;
 }
 
 .search-loader {
@@ -43,10 +41,8 @@
 }
 
 .search-item {
-  background-color: none;
-  padding: 10px 8px;
+  background: none;
   list-style: none;
-  margin: 10px;
 }
 
 .search-progress {

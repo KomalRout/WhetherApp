@@ -5,61 +5,63 @@
   width: 120px;
 }
 
-.select-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
+.custom-dropdown-button {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
   display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.label-icon {
-  font-size: 16px; /* can be replaced with inline SVG */
-}
-
-.custom-select {
+  gap: 10px;
   width: 120px;
   height: 37px;
-  padding: 10px 12px;
-  font-size: 16px;
-  color: #333;
-  border: 1px solid var(--neutral-600);
-  border-radius: 8px;
-  background: #fff;
-  padding: 8px 16px;
-
-  /* remove default arrow */
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-
-  cursor: pointer;
-}
-
-/* add custom arrow */
-.custom-select {
-  background-image: url("../../public/assets/images/icon-dropdown.svg");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 14px;
+  padding: 12px 16px;
   background-color: var(--neutral-600);
-  color: var(--neutral-0);
-  padding-right: 36px;
+  justify-items: center;
+  align-items: center;
+  border-radius: 8px;
+  justify-content: space-evenly;
 }
 
-.custom-select:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+.MuiPaper-root {
+  background: none;
 }
 
-select option {
+.MuiPopover-paper .MuiMenu-paper {
+  background: none;
+}
+
+.Mui-selected {
+  background-color: var(--neutral-700) !important;
+}
+.custom-dropdown-popper {
   background: var(--neutral-800);
   color: var(--neutral-0);
+  border-radius: 12px;
+  height: fit-content;
+  border: 1px solid var(--neutral-600);
 }
 
-.unitStyling {
+.custom-dropdown-list {
+  background-color: var(--neutral-800);
+  position: relative;
+  overflow: auto;
+  width: 214px;
+  cursor: pointer;
+  padding: 6px 8px;
+  gap: 4px;
   display: flex;
-  justify-content: space-around;
+  flex-direction: column;
+}
+
+.divider {
+  background-color: var(--neutral-600);
+}
+
+.selected-item {
+  width: 198px;
+  border-radius: 8px;
+  background-color: var(--neutral-700);
 }
