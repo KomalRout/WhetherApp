@@ -11,10 +11,10 @@ import {
 } from "./reducers/appSlice";
 import WMOInterpretation from "./components/WMOInterpretation/WMOInterpretation";
 import { LinearLoader } from "./components/Loader/Loader";
-import { transformWithEsbuild } from "vite";
 
 const App = () => {
   const dispatch = useDispatch();
+  const [unitType, setUnitType] = useState("metric");
   const unit_options = [
     {
       key: "imperial",
@@ -26,7 +26,7 @@ const App = () => {
       key: "metric",
       label: "Switch to Metric",
       selected: true,
-      metric: ["celsius", "kmh", "mm"],
+      metric: ["celsius", "kmph", "mm"],
     },
     {
       group: "temperature",
@@ -35,7 +35,7 @@ const App = () => {
         {
           key: "celsius",
           label: "Celsius (°C)",
-          selected: transformWithEsbuild,
+          selected: true,
         },
         {
           key: "fehrenheit",
@@ -49,13 +49,13 @@ const App = () => {
       groupLabel: "Wind Speed",
       options: [
         {
-          key: "kmh",
-          label: "Kilometers per hour (km/h)",
+          key: "kmph",
+          label: "km/h",
           selected: true,
         },
         {
           key: "mph",
-          label: "Miles per hour (mph)",
+          label: "m/h",
           selected: false,
         },
       ],
@@ -70,7 +70,7 @@ const App = () => {
           selected: true,
         },
         {
-          key: "inches",
+          key: "in",
           label: "Inches (in)",
           selected: false,
         },
@@ -114,14 +114,7 @@ const App = () => {
     weekday: "short",
   });
 
-  const InputPlaceholder = () => {
-    return (
-      <>
-        <img src="assets/images/search-icon.svg" alt="search icon" />
-        <span>Search for a place ...</span>
-      </>
-    );
-  };
+  const [selectedDay, setSelectedDay] = useState("_");
 
   const [filteredHourlyForcast, setFilteredHourlyForcast] = useState([]);
 
@@ -130,25 +123,54 @@ const App = () => {
   const hourlyForcast = state.hourlyForcast;
   const currentForcast = state.currentWeatherInfo;
   const location = state.locationSelected;
+  const precipitation_unit = unitType === "metric" ? "mm" : "inch";
+  const wind_speed_unit = unitType === "metric" ? "km/h" : "m/h";
 
   let feelsLike = currentForcast.apparent_temperature
-    ? currentForcast.apparent_temperature + "°"
+    ? currentForcast.apparent_temperature + " °"
     : "_";
-  let humidity = currentForcast.humidity ? currentForcast.humidity + "%" : "_";
-  let wind = currentForcast.windSpeed ? currentForcast.windSpeed + "km/h" : "_";
+  let humidity = currentForcast.humidity ? currentForcast.humidity + " %" : "_";
+  let wind = currentForcast.windSpeed
+    ? currentForcast.windSpeed + " " + wind_speed_unit
+    : "_";
   let precipitation = currentForcast.precipitation
-    ? currentForcast.precipitation + "%"
+    ? currentForcast.precipitation + " " + precipitation_unit
     : "_";
 
   const onDaySelect = (day) => {
     const filteredData = hourlyForcast.filter((item) => item.key === day);
+
+    setSelectedDay(
+      hourly_forcast?.filter((item) => item.key === day)[0]?.label || ""
+    );
     setFilteredHourlyForcast(filteredData);
   };
 
-  const onUnitChange = (val = "metric") => {
-    let modified = unit_options?.filter((item) => item.key !== val);
+  const onUnitChange = (val) => {
+    let unit_keys = unit_options?.filter((item) => item.key === val)[0][val];
+    let modified = unit_options
+      ?.filter((item) => item.key !== val)
+      ?.map((item) => {
+        if (item?.hasOwnProperty("group")) {
+          item.options = item.options?.map((opt) => {
+            if (unit_keys?.includes(opt.key)) {
+              opt.selected = true;
+            } else {
+              opt.selected = false;
+            }
+            return opt;
+          });
+          return item;
+        }
+        return item;
+      });
     setUnit(modified);
+    setUnitType(val);
   };
+
+  useEffect(() => {
+    onUnitChange(unitType);
+  }, [unitType]);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
@@ -156,6 +178,7 @@ const App = () => {
         let weatherData = await fetchWeatherData([
           state.longitude,
           state.latitude,
+          unitType,
         ]);
 
         dispatch(setDailyForcast(weatherData.daily));
@@ -163,11 +186,13 @@ const App = () => {
         dispatch(setCurrentWeatherInfo(weatherData.current));
       }
     }, 500);
-    debugger;
-    onUnitChange();
-    onDaySelect(todaysDay);
     return () => clearTimeout(delayDebounceFn);
-  }, [state.latitude, state.longitude]);
+  }, [state.latitude, state.longitude, unitType]);
+
+  useEffect(() => {
+    if (hourlyForcast.length === 0) return;
+    onDaySelect(todaysDay);
+  }, [hourlyForcast]);
 
   return (
     <div>
@@ -243,6 +268,7 @@ const App = () => {
                 ).map((daily, index) => {
                   return (
                     <div
+                      id={`daily-forcast-${index}`}
                       key={`daily-forcast-${index}`}
                       className={`forcast-item card-item ${
                         !daily ? "loading" : ""
@@ -274,16 +300,19 @@ const App = () => {
                 options={hourlyForcast.length > 0 ? hourly_forcast : []}
                 onChange={(value) => onDaySelect(value)}
                 todaysDay={todaysDay}
+                label={selectedDay}
               />
             </div>
             <div className="hourly-forcast-content">
               {(hourlyForcast.length > 0
                 ? filteredHourlyForcast
                 : Array.from({ length: 10 })
-              )?.map((item) => {
+              )?.map((item, index) => {
                 return (
                   <div
+                    id={`hourly-forcast-item-${index}`}
                     className={`hourly-forcast-item ${!item ? "loading" : ""}`}
+                    key={`hourly-forcast-item-${index}`}
                   >
                     {item ? (
                       <>

@@ -1,8 +1,7 @@
 import axios from "axios";
 import { fetchWeatherApi } from "openmeteo";
 
-export const fetchWeatherData = async (location) => {
-  const [longitude, latitude] = location;
+export const fetchWeatherData = async ([longitude, latitude, unitType]) => {
   const params = {
     latitude: latitude,
     longitude: longitude,
@@ -16,6 +15,9 @@ export const fetchWeatherData = async (location) => {
       "temperature_2m",
       "weather_code",
     ],
+    temperature_unit: unitType === "metric" ? "celsius" : "fahrenheit",
+    wind_speed_unit: unitType === "metric" ? "kmh" : "mph",
+    precipitation_unit: unitType === "metric" ? "mm" : "inch",
   };
   const url = "https://api.open-meteo.com/v1/forecast";
   const responses = await fetchWeatherApi(url, params).then((res) => res);
@@ -80,12 +82,12 @@ export const fetchWeatherData = async (location) => {
 };
 
 export const fetchLocationData = async (query) => {
-  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${query}&count=5&language=en&format=json`;
+  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${query}&count=10&language=en&format=json`;
   const response = await axios(url).then((res) => {
     return res.data.results;
   });
-  let processedData = (response ?? []).map((item, index) => {
-    response;
+  let processedData = [];
+  (response ?? []).forEach((item, index) => {
     let last_admin_index = Object.entries(item)?.reduce((acc, [key, value]) => {
       if (key.startsWith("admin")) {
         let index = parseInt(key.replace("admin", ""));
@@ -93,27 +95,27 @@ export const fetchLocationData = async (query) => {
       }
       return acc;
     }, 0);
-    console.log("last_admin_index", last_admin_index);
     let name = "";
     if (last_admin_index === 0) {
       name = item["country"];
     } else {
-      while (last_admin_index > 0) {
-        let admin_key = `admin${last_admin_index}`;
-        if (item[admin_key]) {
-          name =
-            name === "" ? `${item[admin_key]}` : `${name}, ${item[admin_key]}`;
-        }
-        last_admin_index--;
+      let admin_key = `admin${last_admin_index}`;
+      if (
+        processedData?.length > 0 &&
+        processedData[processedData.length - 1]?.name === item[admin_key]
+      ) {
+        let prevIndex = `admin${last_admin_index--}`;
+        name = `${item[prevIndex]} , ${item["country"]}`;
+      } else {
+        name = `${item[admin_key]} , ${item["country"]}`;
       }
-      name = name + `, ${item["country"]}`;
     }
 
-    return {
+    processedData?.push({
       name,
       long: item.longitude,
       lat: item.latitude,
-    };
+    });
   });
   return processedData;
 };
