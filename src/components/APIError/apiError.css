@@ -1,0 +1,40 @@
+.error-container {
+  width: 100%;
+  align-items: center;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: 100%;
+  margin: 40px 0px;
+}
+
+.error-img {
+  width: 42px;
+  height: 50px;
+}
+
+.error-title {
+  font-family: "BricolageGrotesque_Bold";
+  font-size: 52px;
+  line-height: 120%;
+}
+
+.error-text {
+  font-family: "DMSans-Medium";
+  font-size: 20px;
+  line-height: 120%;
+  width: 554px;
+}
+
+.retry-btn {
+  width: 98px;
+  height: 43px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--neutral-600);
+  border: none;
+  border-radius: 8px;
+}

@@ -37,11 +37,9 @@
   background-color: var(--neutral-700) !important;
 }
 .custom-dropdown-popper {
-  background: var(--neutral-800);
-  color: var(--neutral-0);
+  background-color: var(--neutral-800);
   border-radius: 12px;
   height: fit-content;
-  border: 1px solid var(--neutral-600);
 }
 
 .custom-dropdown-list {

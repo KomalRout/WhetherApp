@@ -1,23 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
-import "./Dropdown.css";
+import { useState } from "react";
+import "./dropdown.css";
 import {
-  Box,
   ClickAwayListener,
   Divider,
-  List,
-  ListItem,
   ListItemText,
   ListSubheader,
-  Menu,
+  Popover,
   MenuItem,
   MenuList,
-  Paper,
-  Popper,
 } from "@mui/material";
 
 const Dropdown = ({ options, label, icon, onChange, ...props }) => {
-  const [selectedOption, setSelectedOption] = useState("");
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     onChange(event?.target?.ariaLabel);
@@ -35,20 +29,20 @@ const Dropdown = ({ options, label, icon, onChange, ...props }) => {
   return (
     <div className="select-wrapper">
       <button className="custom-dropdown-button" onClick={handleToggle}>
-        {icon && <img className="button-icon" src={icon} />}
+        {icon && <img alt="settings-icon" className="button-icon" src={icon} />}
         {label && (
           <span className="button-label" onClick={handleToggle}>
             {label}
           </span>
         )}
-        <img src="public/assets/images/icon-dropdown.svg" />
+        <img alt="dropdown" src="public/assets/images/icon-dropdown.svg" />
       </button>
-      <Menu
+      <Popover
         elevation={0}
         id="positioned-menu"
         aria-labelledby="demo-positioned-button"
         anchorEl={anchorEl}
-        open={open}
+        open={open && options?.length > 0}
         onClose={handleClose}
         anchorOrigin={{
           vertical: "bottom",
@@ -58,7 +52,7 @@ const Dropdown = ({ options, label, icon, onChange, ...props }) => {
           vertical: "top",
           horizontal: "left",
         }}
-        classes={{ list: "custom-dropdown-popper" }}
+        classes={{ paper: "custom-dropdown-popper" }}
       >
         <ClickAwayListener onClickAway={handleClose}>
           <MenuList
@@ -88,7 +82,10 @@ const Dropdown = ({ options, label, icon, onChange, ...props }) => {
                         >
                           <ListItemText> {subOption.label} </ListItemText>
                           {subOption?.selected && (
-                            <img src="public/assets/images/icon-checkmark.svg" />
+                            <img
+                              alt="checkmark"
+                              src="public/assets/images/icon-checkmark.svg"
+                            />
                           )}
                         </MenuItem>
                       );
@@ -112,7 +109,7 @@ const Dropdown = ({ options, label, icon, onChange, ...props }) => {
             })}
           </MenuList>
         </ClickAwayListener>
-      </Menu>
+      </Popover>
     </div>
   );
 };

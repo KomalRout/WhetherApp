@@ -1,11 +1,12 @@
 import "./search.css";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { setLatLong, setLocation } from "../../reducers/appSlice";
 import { useDispatch } from "react-redux";
 import { fetchLocationData } from "../../service";
 import { CircleLoader } from "../Loader/Loader";
+import { Input, InputAdornment, TextField } from "@mui/material";
 
-const Search = () => {
+const Search = (props) => {
   const [searchValue, setSearchValue] = useState("");
   const [data, setData] = useState(new Set());
   const dispatch = useDispatch();
@@ -30,6 +31,11 @@ const Search = () => {
     }
     const delayDebounceFn = setTimeout(async () => {
       let response = await fetchLocationData(searchValue);
+      if (response?.length === 0) {
+        props.setSearchFound(false);
+        return;
+      }
+      props.setSearchFound(true);
       setData(response);
     }, 500);
 
@@ -39,42 +45,61 @@ const Search = () => {
   return (
     <div className="search-container">
       <div>
-        <input
+        <Input
           id="search-input"
           name="search-input"
           className="search-input"
+          classes={{ root: "search-input" }}
           type="search"
           placeholder="Search for a place..."
           value={searchValue}
           onChange={(e) => handleOnChangeValue(e)}
+          autoComplete="off"
+          startAdornment={
+            <InputAdornment position="start">
+              <img alt="search" src="public/assets/images/icon-search.svg" />
+            </InputAdornment>
+          }
+          disableUnderline
+          sx={{
+            color: "var(--neutral-200)",
+            // borderRadius: "5px",
+
+            // bgcolor: "var(--neutral-800)",
+            // padding: "16px 24px",
+            // width: "100%",
+            // height: "56px",
+          }}
         />
         {searchValue !== "" ? (
-          <ul
-            className={
-              data?.length > 0
-                ? "search-dropdown"
-                : `search-dropdown search-loader`
-            }
-          >
-            {data.length > 0 ? (
-              data?.map((item) => (
-                <li
-                  key={item.name?.toLowerCase()?.trim()?.replace(",", "_")}
-                  className="search-item"
-                  onClick={() => onOptionClick(item)}
-                >
-                  {item?.name}
-                </li>
-              ))
-            ) : (
-              <p className="search-progress" key="search_in_progress">
-                <span>
-                  <CircleLoader />
-                </span>
-                <span>Search in progress...</span>
-              </p>
-            )}
-          </ul>
+          props?.searchFound && (
+            <ul
+              className={
+                data?.length > 0
+                  ? "search-dropdown"
+                  : `search-dropdown search-loader`
+              }
+            >
+              {data.length > 0
+                ? data?.map((item) => (
+                    <li
+                      key={item.name?.toLowerCase()?.trim()?.replace(",", "_")}
+                      className="search-item"
+                      onClick={() => onOptionClick(item)}
+                    >
+                      {item?.name}
+                    </li>
+                  ))
+                : props?.searchFound && (
+                    <p className="search-progress" key="search_in_progress">
+                      <span>
+                        <CircleLoader />
+                      </span>
+                      <span>Search in progress...</span>
+                    </p>
+                  )}
+            </ul>
+          )
         ) : (
           <></>
         )}
