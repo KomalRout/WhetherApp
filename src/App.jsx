@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import Dropdown from "./components/Dropdown/Dropdown";
 import Search from "./components/Search/Search";
@@ -11,10 +11,13 @@ import {
 } from "./reducers/appSlice";
 import WMOInterpretation from "./components/WMOInterpretation/WMOInterpretation";
 import { LinearLoader } from "./components/Loader/Loader";
+import APIError from "./components/APIError/APIError";
 
 const App = () => {
   const dispatch = useDispatch();
   const [unitType, setUnitType] = useState("metric");
+  const [error, setError] = useState(true);
+
   const unit_options = [
     {
       key: "imperial",
@@ -117,7 +120,7 @@ const App = () => {
   const [selectedDay, setSelectedDay] = useState("_");
 
   const [filteredHourlyForcast, setFilteredHourlyForcast] = useState([]);
-
+  const [searchFound, setSearchFound] = useState(true);
   const state = useSelector((state) => state.appReducer);
   const dailyForcast = state.dailyForcast;
   const hourlyForcast = state.hourlyForcast;
@@ -170,20 +173,23 @@ const App = () => {
 
   useEffect(() => {
     onUnitChange(unitType);
-  }, [unitType]);
+  }, []);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
-      if (state.latitude !== "" || state.longitude !== "") {
-        let weatherData = await fetchWeatherData([
-          state.longitude,
-          state.latitude,
-          unitType,
-        ]);
-
-        dispatch(setDailyForcast(weatherData.daily));
-        dispatch(setHourlyForcast(weatherData.hourly));
-        dispatch(setCurrentWeatherInfo(weatherData.current));
+      try {
+        if (state.latitude !== "" || state.longitude !== "") {
+          let weatherData = await fetchWeatherData([
+            state.longitude,
+            state.latitude,
+            unitType,
+          ]);
+          dispatch(setDailyForcast(weatherData.daily));
+          dispatch(setHourlyForcast(weatherData.hourly));
+          dispatch(setCurrentWeatherInfo(weatherData.current));
+        }
+      } catch (err) {
+        setError(true);
       }
     }, 500);
     return () => clearTimeout(delayDebounceFn);
@@ -197,7 +203,7 @@ const App = () => {
   return (
     <div>
       <header>
-        <img src="assets/images/logo.svg" />
+        <img alt="weather-logo" src="assets/images/logo.svg" />
         <Dropdown
           options={unit}
           label={"Unit"}
@@ -205,131 +211,154 @@ const App = () => {
           icon={"assets/images/icon-units.svg"}
         />
       </header>
-      <div className="title-container">
-        <p className="title">How's the sky looking today?</p>
-      </div>
-      <main className="main-content-container">
-        <Search />
-        <div className="content-container">
-          <div className="left-content">
-            {/* Weather Information Section */}
-            <div className="weather-info">
-              {Object.keys(currentForcast)?.length > 0 ? (
-                <>
-                  <img
-                    src="assets/images/bg-today-large.svg"
-                    alt="weather_bg_large"
-                  />
-                  <div className="location-info">
-                    <p>{location}</p>
-                    <p>{currentForcast.time}</p>
-                  </div>
-                  <div className="temperature-info">
-                    <img
-                      src="public/assets/images/icon-sunny.webp"
-                      alt="sunny-icon"
-                    />
-                    <p>{currentForcast.temperature + "°"}</p>
-                  </div>
-                </>
-              ) : (
-                <div className="current-weather-loader">
-                  <LinearLoader />
-                  <p>Loading...</p>
-                </div>
-              )}
-            </div>
-            {/* Temperature Details Section */}
-            <div className="temperature-details">
-              <div className="detail-item card-item">
-                <p>Feels Like</p>
-                <p>{feelsLike}</p>
-              </div>
-              <div className="detail-item card-item">
-                <p>Humidity</p>
-                <p>{humidity}</p>
-              </div>
-              <div className="detail-item card-item">
-                <p>Wind</p>
-                <p>{wind}</p>
-              </div>
-              <div className="detail-item card-item">
-                <p>Precipitation</p>
-                <p>{precipitation}</p>
-              </div>
-            </div>
-            {/* Daily Forcast Section */}
-            <div className="daily-forcast">
-              <p>Daily Forcast</p>
-              <div className="forcast-details">
-                {(dailyForcast?.length > 0
-                  ? dailyForcast
-                  : Array.from({ length: 5 })
-                ).map((daily, index) => {
-                  return (
-                    <div
-                      id={`daily-forcast-${index}`}
-                      key={`daily-forcast-${index}`}
-                      className={`forcast-item card-item ${
-                        !daily ? "loading" : ""
-                      }`}
-                    >
-                      {daily ? (
-                        <>
-                          <p>{daily.day}</p>
-                          <WMOInterpretation code={daily.weather_code} />
-                          <div className="temp-range">
-                            <p>{daily.temperature_max + "°"}</p>
-                            <p>{daily.temperature_min + "°"}</p>
-                          </div>
-                        </>
-                      ) : (
-                        <></>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+      {!error ? (
+        <section>
+          <div className="title-container">
+            <p className="title">How's the sky looking today?</p>
           </div>
-          {/* Hourly Forcast Section */}
-          <div className="hourly-forecast">
-            <div className="hourly-forecast-header">
-              <p>Hourly Forecast</p>
-              <Dropdown
-                options={hourlyForcast.length > 0 ? hourly_forcast : []}
-                onChange={(value) => onDaySelect(value)}
-                todaysDay={todaysDay}
-                label={selectedDay}
-              />
-            </div>
-            <div className="hourly-forcast-content">
-              {(hourlyForcast.length > 0
-                ? filteredHourlyForcast
-                : Array.from({ length: 10 })
-              )?.map((item, index) => {
-                return (
-                  <div
-                    id={`hourly-forcast-item-${index}`}
-                    className={`hourly-forcast-item ${!item ? "loading" : ""}`}
-                    key={`hourly-forcast-item-${index}`}
-                  >
-                    {item ? (
-                      <>
-                        <WMOInterpretation code={item.weather_code} />
-                        <p>{item.time_stamp}</p>
-                        <p>{`${item.temperature}°`}</p>
-                      </>
+          <main className="main-content-container">
+            <Search searchFound={searchFound} setSearchFound={setSearchFound} />
+            {searchFound ? (
+              <div className="content-container">
+                <div className="left-content">
+                  {/* Weather Information Section */}
+                  <div className="weather-info-container ">
+                    {Object.keys(currentForcast)?.length > 0 ? (
+                      <div className="weather-info">
+                        <div className="location-info">
+                          <p className="location-title">{location}</p>
+                          <p className="location-time">{currentForcast.time}</p>
+                        </div>
+                        <div className="temperature-info">
+                          <WMOInterpretation
+                            code={currentForcast.weather_code}
+                          />
+                          <p>{currentForcast.temperature + "°"}</p>
+                        </div>
+                        {/* </div> */}
+                      </div>
                     ) : (
-                      <></>
+                      <div className="current-weather-loader">
+                        <LinearLoader />
+                        <p>Loading...</p>
+                      </div>
                     )}
+                    {/* Temperature Details Section */}
+                    <div className="temperature-details">
+                      <div className="detail-item card-item">
+                        <p className="temp-info-title">Feels Like</p>
+                        <p className="temp-info-value">{feelsLike}</p>
+                      </div>
+                      <div className="detail-item card-item">
+                        <p className="temp-info-title">Humidity</p>
+                        <p className="temp-info-value">{humidity}</p>
+                      </div>
+                      <div className="detail-item card-item">
+                        <p className="temp-info-title">Wind</p>
+                        <p className="temp-info-value">{wind}</p>
+                      </div>
+                      <div className="detail-item card-item">
+                        <p className="temp-info-title">Precipitation</p>
+                        <p className="temp-info-value">{precipitation}</p>
+                      </div>
+                    </div>
                   </div>
-                );
-              })}
-            </div>
-          </div>
+                  {/* Daily Forcast Section */}
+                  <div className="daily-forcast">
+                    <p className="daily-forcast-title">Daily Forcast</p>
+                    <div className="forcast-details">
+                      {(dailyForcast?.length > 0
+                        ? dailyForcast
+                        : Array.from({ length: 7 })
+                      ).map((daily, index) => {
+                        return (
+                          <div
+                            id={`daily-forcast-${index}`}
+                            key={`daily-forcast-${index}`}
+                            className={`forcast-item card-item ${
+                              !daily ? "loading" : ""
+                            }`}
+                          >
+                            {daily ? (
+                              <>
+                                <p className="day-label">{daily.day}</p>
+                                <WMOInterpretation code={daily.weather_code} />
+                                <div className="temp-range">
+                                  <p className="temp-range-value">
+                                    {daily.temperature_max + "°"}
+                                  </p>
+                                  <p className="temp-range-value">
+                                    {daily.temperature_min + "°"}
+                                  </p>
+                                </div>
+                              </>
+                            ) : (
+                              <></>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+                {/* Hourly Forcast Section */}
+                <div className="hourly-forecast">
+                  <div className="hourly-forecast-header">
+                    <p className="hourly-forecast-text">Hourly Forecast</p>
+                    <Dropdown
+                      options={hourlyForcast.length > 0 ? hourly_forcast : []}
+                      onChange={(value) => onDaySelect(value)}
+                      todaysDay={todaysDay}
+                      label={selectedDay}
+                    />
+                  </div>
+                  <div className="hourly-forcast-content">
+                    {(hourlyForcast.length > 0
+                      ? filteredHourlyForcast
+                      : Array.from({ length: 10 })
+                    )?.map((item, index) => {
+                      return (
+                        <div
+                          id={`hourly-forcast-item-${index}`}
+                          className={`hourly-forcast-item ${
+                            !item ? "loading" : ""
+                          }`}
+                          key={`hourly-forcast-item-${index}`}
+                        >
+                          {item ? (
+                            <>
+                              <WMOInterpretation code={item.weather_code} />
+                              <p className="hourly-forecast-text">
+                                {item.time_stamp}
+                              </p>
+                              <p className="hourly-forecast-temp">{`${item.temperature}°`}</p>
+                            </>
+                          ) : (
+                            <></>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p>No search results found!</p>
+            )}
+          </main>
+        </section>
+      ) : (
+        <APIError />
+      )}
+      <footer>
+        <div className="attribution">
+          Challenge by{" "}
+          <a href="https://www.frontendmentor.io?ref=challenge">
+            Frontend Mentor
+          </a>
+          . Coded by <a href="#">Komal Rout</a>.
         </div>
-      </main>
+      </footer>
     </div>
   );
 };

@@ -88,6 +88,7 @@ export const fetchLocationData = async (query) => {
   });
   let processedData = [];
   (response ?? []).forEach((item, index) => {
+    if (!item?.hasOwnProperty("country")) return;
     let last_admin_index = Object.entries(item)?.reduce((acc, [key, value]) => {
       if (key.startsWith("admin")) {
         let index = parseInt(key.replace("admin", ""));
@@ -102,7 +103,7 @@ export const fetchLocationData = async (query) => {
       let admin_key = `admin${last_admin_index}`;
       if (
         processedData?.length > 0 &&
-        processedData[processedData.length - 1]?.name === item[admin_key]
+        processedData?.every((ele) => ele.name === item[admin_key])
       ) {
         let prevIndex = `admin${last_admin_index--}`;
         name = `${item[prevIndex]} , ${item["country"]}`;
