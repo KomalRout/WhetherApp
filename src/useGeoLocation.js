@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setLatLong, setLocation } from "./reducers/appSlice";
+import axios from "axios";
+import { getCurrentLocationDetails } from "./service";
 
 export const useGeoLocation = () => {
   const dispatch = useDispatch();
@@ -17,10 +19,10 @@ export const useGeoLocation = () => {
     }
 
     function handleSuccess(position) {
-      console.log(position);
       const { latitude, longitude } = position.coords;
-      //let url = `https://us1.locationiq.com/v1/reverse?key=pk.95082acc4e35c8248b45d411ecce3c67&lat=${latitude}&lon=${longitude}&format=json&`;
+      let locationName = getCurrentLocationDetails(latitude, longitude);
       dispatch(setLatLong({ latitude, longitude }));
+      dispatch(setLocation(locationName));
     }
 
     function handleError(error) {
