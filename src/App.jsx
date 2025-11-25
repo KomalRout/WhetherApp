@@ -12,11 +12,13 @@ import {
 import WMOInterpretation from "./components/WMOInterpretation/WMOInterpretation";
 import { LinearLoader } from "./components/Loader/Loader";
 import APIError from "./components/APIError/APIError";
+import { useGeoLocation } from "./useGeoLocation";
 
 const App = () => {
   const dispatch = useDispatch();
   const [unitType, setUnitType] = useState("metric");
-  const [error, setError] = useState(true);
+  const [error, setError] = useState(false);
+  const { refresh, error: locationError } = useGeoLocation();
 
   const unit_options = [
     {
