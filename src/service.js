@@ -120,3 +120,14 @@ export const fetchLocationData = async (query) => {
   });
   return processedData;
 };
+
+export const getCurrentLocationDetails = async (latitude, longitude) => {
+  const key = import.meta.env.VITE_LOCATIONIQ_API_KEY;
+  let url = `https://us1.locationiq.com/v1/reverse?key=${key}&lat=${latitude}&lon=${longitude}&format=json&`;
+  let response = await axios.get(url).then((res) => {
+    return res.data;
+  });
+  return `${response?.address?.town},
+    ${response?.address?.state},
+    ${response?.address?.country}`;
+};
