@@ -13,7 +13,7 @@ npm-debug.log*
 .DS_Store
 
 # Environment variables
-
+.env
 
 # IDE files
 .vscode/
