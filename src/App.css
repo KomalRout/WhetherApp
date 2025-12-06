@@ -66,6 +66,7 @@ header {
   background-image: url("assets/images/bg-today-small.svg");
   flex-direction: column;
   padding: 10px;
+  border-radius: 25px;
 }
 
 .current-weather-loader {
@@ -325,6 +326,7 @@ p {
     padding: 0px;
     min-height: 286px;
     background-image: url("assets/images/bg-today-large.svg");
+    border-radius: 25px;
   }
 
   .current-weather-loader {

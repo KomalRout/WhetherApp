@@ -123,11 +123,14 @@ export const fetchLocationData = async (query) => {
 
 export const getCurrentLocationDetails = async (latitude, longitude) => {
   const key = import.meta.env.VITE_LOCATIONIQ_API_KEY;
+  let resultedLocation = "";
   let url = `https://us1.locationiq.com/v1/reverse?key=${key}&lat=${latitude}&lon=${longitude}&format=json&`;
-  let response = await axios.get(url).then((res) => {
-    return res.data;
-  });
-  return `${response?.address?.town},
-    ${response?.address?.state},
-    ${response?.address?.country}`;
+  try {
+    let response = await axios.get(url);
+    const { data } = response; // Access the data property of the response
+    return `${data?.address?.town}, ${data?.address?.state}, ${data?.address?.country}`;
+  } catch (err) {
+    console.error("Error fetching location data:", err);
+    return err;
+  }
 };

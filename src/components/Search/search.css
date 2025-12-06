@@ -24,7 +24,7 @@
 }
 
 .search-dropdown {
-  width: 510px;
+  width: 343px;
   height: 148px;
   background-color: var(--neutral-800);
   position: absolute;
@@ -69,6 +69,10 @@
     flex-direction: row;
   }
 
+  .search-dropdown {
+    width: 656px;
+  }
+
   .search-input {
     height: 56px;
     width: 526px;
@@ -84,6 +88,10 @@
     width: 656px;
     height: 56px;
     flex-direction: row;
+  }
+
+  .search-dropdown {
+    width: 656px;
   }
 
   .search-input {
