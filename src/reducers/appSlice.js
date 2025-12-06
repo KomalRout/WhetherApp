@@ -15,11 +15,7 @@ export const appSlice = createSlice({
   initialState,
   reducers: {
     setLocation: (state, action) => {
-<<<<<<< HEAD
       state.locationSelected = action.payload?.toString();
-=======
-      state.locationSelected = action.payload;
->>>>>>> 7d963a4365a46ae83e68da95481d118ae70a8ed1
     },
     setLatLong: (state, action) => {
       state.longitude = action.payload.longitude;

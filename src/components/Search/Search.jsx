@@ -63,15 +63,6 @@ const Search = (props) => {
           disableUnderline
           sx={{
             color: "var(--neutral-200)",
-<<<<<<< HEAD
-=======
-            // borderRadius: "5px",
-
-            // bgcolor: "var(--neutral-800)",
-            // padding: "16px 24px",
-            // width: "100%",
-            // height: "56px",
->>>>>>> 7d963a4365a46ae83e68da95481d118ae70a8ed1
           }}
         />
         {searchValue !== "" ? (
