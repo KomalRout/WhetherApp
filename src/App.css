@@ -475,11 +475,6 @@ p {
 .attribution a {
   color: var(--blue-500);
 }
-body {
-  background-color: var(--neutral-900);
-  display: flex;
-  flex-direction: column;
-}
 
 header {
   display: flex;
