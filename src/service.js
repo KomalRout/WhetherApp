@@ -127,7 +127,12 @@ export const getCurrentLocationDetails = async (latitude, longitude) => {
   let response = await axios.get(url).then((res) => {
     return res.data;
   });
-  return `${response?.address?.town},
+  let townOrProvince =
+    response?.address?.town ||
+    response?.address?.county ||
+    response?.address?.state_district;
+
+  return `${townOrProvince || ""},
     ${response?.address?.state},
     ${response?.address?.country}`;
 };
