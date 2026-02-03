@@ -11,6 +11,28 @@ header {
   gap: 5px;
 }
 
+.header-right-content {
+  display: flex;
+  gap: 4px;
+}
+
+.favorite-list-icon {
+  width: 34px;
+  height: 37px;
+  cursor: pointer;
+}
+
+.weather {
+  display: flex;
+  flex-direction: column;
+}
+.favorite-icon {
+  width: fit-content;
+  height: fit-content;
+  position: absolute;
+  transform: translate(682px, 10px);
+  cursor: pointer;
+}
 .unit-select {
   width: 120px;
 }
@@ -432,6 +454,10 @@ p {
     height: 120px;
     transform: translate(73px, 83px);
     text-align: left;
+  }
+
+  .favorite-icon {
+    transform: translate(762px, 10px);
   }
 
   .temperature-details {

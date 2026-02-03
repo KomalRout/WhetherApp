@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import Dropdown from "./components/Dropdown/Dropdown";
 import Search from "./components/Search/Search";
@@ -7,12 +7,17 @@ import { fetchWeatherData } from "./service";
 import {
   setCurrentWeatherInfo,
   setDailyForcast,
+  setFavoriteLocations,
   setHourlyForcast,
 } from "./reducers/appSlice";
-import WMOInterpretation from "./components/WMOInterpretation/WMOInterpretation";
+import WeatherIcon from "./components/WeatherIconAndAnimation/WeatherIcon";
 import { LinearLoader } from "./components/Loader/Loader";
 import APIError from "./components/APIError/APIError";
 import { useGeoLocation } from "./useGeoLocation";
+import WeatherAnimation from "./components/WeatherIconAndAnimation/WeatherAnimation";
+import SavedLocation from "./components/SavedLocation/SavedLocation";
+import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
+import { FavoriteOutlined } from "@mui/icons-material";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -123,11 +128,17 @@ const App = () => {
 
   const [filteredHourlyForcast, setFilteredHourlyForcast] = useState([]);
   const [searchFound, setSearchFound] = useState(true);
+  const [savedLocBtnClicked, setSavedLocBtnClicked] = useState(false);
+  const [favoriteBtnClicked, setFavoriteBtnClicked] = useState(false);
+
   const state = useSelector((state) => state.appReducer);
   const dailyForcast = state.dailyForcast;
   const hourlyForcast = state.hourlyForcast;
   const currentForcast = state.currentWeatherInfo;
   const location = state.locationSelected;
+  const currentLattitude = state.latitude;
+  const currentLongitude = state.longitude;
+
   const precipitation_unit = unitType === "metric" ? "mm" : "inch";
   const wind_speed_unit = unitType === "metric" ? "km/h" : "m/h";
 
@@ -146,7 +157,7 @@ const App = () => {
     const filteredData = hourlyForcast.filter((item) => item.key === day);
 
     setSelectedDay(
-      hourly_forcast?.filter((item) => item.key === day)[0]?.label || ""
+      hourly_forcast?.filter((item) => item.key === day)[0]?.label || "",
     );
     setFilteredHourlyForcast(filteredData);
   };
@@ -202,16 +213,93 @@ const App = () => {
     onDaySelect(todaysDay);
   }, [hourlyForcast]);
 
+  const onSavedLocClick = () => {
+    setSavedLocBtnClicked(!savedLocBtnClicked);
+  };
+
+  const handleFavoriteLocationList = (val) => {
+    if (val) {
+      if (localStorage.getItem("favoriteLocations")) {
+        let storedFavLocs = JSON.parse(
+          localStorage.getItem("favoriteLocations"),
+        );
+        if (
+          location &&
+          storedFavLocs.filter((loc) => loc.locationName === location)
+            .length === 0
+        ) {
+          let updatedFavList = [
+            ...storedFavLocs,
+            {
+              locationName: location,
+              latitude: state.latitude,
+              longitude: state.longitude,
+            },
+          ];
+
+          localStorage.setItem(
+            "favoriteLocations",
+            JSON.stringify(updatedFavList),
+          );
+          dispatch(setFavoriteLocations(updatedFavList));
+        }
+      } else {
+        let newFavList = [
+          {
+            locationName: location,
+            latitude: state.latitude,
+            longitude: state.longitude,
+          },
+        ];
+        localStorage.setItem("favoriteLocations", JSON.stringify(newFavList));
+        dispatch(setFavoriteLocations(newFavList));
+      }
+    }
+    // if (val) {
+    //   if (
+    //     location &&
+    //     favoriteLocationsList.filter((loc) => loc.locationName === location)
+    //       .length === 0
+    //   ) {
+    //     let updatedFavList = [
+    //       ...favoriteLocationsList,
+    //       {
+    //         locationName: location,
+    //         latitude: state.latitude,
+    //         longitude: state.longitude,
+    //       },
+    //     ];
+    //     // Update favorite locations in redux store
+    //     dispatch(setFavoriteLocations(updatedFavList));
+    //   }
+    // } else {
+    //   // Hide favorite locations
+    //   let updatedFavList = favoriteLocationsList.filter(
+    //     (loc) => loc.locationName !== location
+    //   );
+    //   dispatch(setFavoriteLocations(updatedFavList));
+    // }
+  };
+
   return (
-    <div>
+    <div style={{ position: "relative" }}>
+      {/* <WeatherAnimation weatherCode={51} /> */}
       <header>
         <img alt="weather-logo" src="assets/images/logo.svg" />
-        <Dropdown
-          options={unit}
-          label={"Unit"}
-          onChange={(val) => onUnitChange(val)}
-          icon={"assets/images/icon-units.svg"}
-        />
+        <div className="header-right-content">
+          <img
+            className="favorite-list-icon"
+            alt="frequently-viewed"
+            src="assets/images/icon-saved.svg"
+            onClick={onSavedLocClick}
+          />
+          <Dropdown
+            options={unit}
+            label={"Unit"}
+            onChange={(val) => onUnitChange(val)}
+            icon={"assets/images/icon-units.svg"}
+          />
+        </div>
       </header>
       {!error ? (
         <section>
@@ -227,17 +315,26 @@ const App = () => {
                   <div className="weather-info-container ">
                     {Object.keys(currentForcast)?.length > 0 ? (
                       <div className="weather-info">
+                        <div
+                          className="favorite-icon"
+                          onClick={() => {
+                            handleFavoriteLocationList(!favoriteBtnClicked);
+                          }}
+                        >
+                          {!favoriteBtnClicked ? (
+                            <FavoriteBorderOutlinedIcon className="favorite-border-icon" />
+                          ) : (
+                            <FavoriteOutlined />
+                          )}
+                        </div>
                         <div className="location-info">
                           <p className="location-title">{location}</p>
                           <p className="location-time">{currentForcast.time}</p>
                         </div>
                         <div className="temperature-info">
-                          <WMOInterpretation
-                            code={currentForcast.weather_code}
-                          />
+                          <WeatherIcon code={currentForcast.weather_code} />
                           <p>{currentForcast.temperature + "°"}</p>
                         </div>
-                        {/* </div> */}
                       </div>
                     ) : (
                       <div className="current-weather-loader">
@@ -284,7 +381,7 @@ const App = () => {
                             {daily ? (
                               <>
                                 <p className="day-label">{daily.day}</p>
-                                <WMOInterpretation code={daily.weather_code} />
+                                <WeatherIcon code={daily.weather_code} />
                                 <div className="temp-range">
                                   <p className="temp-range-value">
                                     {daily.temperature_max + "°"}
@@ -329,7 +426,7 @@ const App = () => {
                         >
                           {item ? (
                             <>
-                              <WMOInterpretation code={item.weather_code} />
+                              <WeatherIcon code={item.weather_code} />
                               <p className="hourly-forecast-text">
                                 {item.time_stamp}
                               </p>
@@ -361,6 +458,9 @@ const App = () => {
           . Coded by <a href="#">Komal Rout</a>.
         </div>
       </footer>
+      {savedLocBtnClicked && (
+        <SavedLocation handleFavBtnClick={onSavedLocClick} />
+      )}
     </div>
   );
 };

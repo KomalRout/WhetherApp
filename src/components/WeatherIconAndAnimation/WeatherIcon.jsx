@@ -1,6 +1,6 @@
 import React from "react";
 
-const WMOInterpretation = ({ code }) => {
+const WeatherIcon = ({ code }) => {
   switch (code) {
     case 0:
       return (
@@ -54,4 +54,4 @@ const WMOInterpretation = ({ code }) => {
   }
 };
 
-export default WMOInterpretation;
+export default WeatherIcon;

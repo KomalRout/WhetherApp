@@ -30,7 +30,7 @@ export const fetchWeatherData = async ([longitude, latitude, unitType]) => {
   const weatherData = {
     current: {
       time: new Date(
-        (Number(current.time()) + utcOffsetSeconds) * 1000
+        (Number(current.time()) + utcOffsetSeconds) * 1000,
       ).toLocaleDateString("en-US", {
         year: "numeric",
         month: "short",
@@ -47,17 +47,18 @@ export const fetchWeatherData = async ([longitude, latitude, unitType]) => {
     hourly: {
       time: [
         ...Array(
-          (Number(hourly.timeEnd()) - Number(hourly.time())) / hourly.interval()
+          (Number(hourly.timeEnd()) - Number(hourly.time())) /
+            hourly.interval(),
         ),
       ].map((_, i) =>
         new Date(
           (Number(hourly.time()) + i * hourly.interval() + utcOffsetSeconds) *
-            1000
+            1000,
         ).toLocaleTimeString("en-US", {
           hour: "numeric",
           hour12: true,
           weekday: "short",
-        })
+        }),
       ),
       temperature: Array.from(hourly.variables(0).valuesArray()),
       weather_code: Array.from(hourly.variables(1).valuesArray()),
@@ -65,13 +66,13 @@ export const fetchWeatherData = async ([longitude, latitude, unitType]) => {
     daily: {
       time: [
         ...Array(
-          (Number(daily.timeEnd()) - Number(daily.time())) / daily.interval()
+          (Number(daily.timeEnd()) - Number(daily.time())) / daily.interval(),
         ),
       ].map((_, i) =>
         new Date(
           (Number(daily.time()) + i * daily.interval() + utcOffsetSeconds) *
-            1000
-        ).toLocaleDateString("en-US", { weekday: "short" })
+            1000,
+        ).toLocaleDateString("en-US", { weekday: "short" }),
       ),
       temperature_min: Array.from(daily.variables(0).valuesArray()),
       temperature_max: Array.from(daily.variables(1).valuesArray()),
@@ -89,27 +90,15 @@ export const fetchLocationData = async (query) => {
   let processedData = [];
   (response ?? []).forEach((item, index) => {
     if (!item?.hasOwnProperty("country")) return;
-    let last_admin_index = Object.entries(item)?.reduce((acc, [key, value]) => {
-      if (key.startsWith("admin")) {
-        let index = parseInt(key.replace("admin", ""));
-        return index > acc ? index : acc;
-      }
-      return acc;
-    }, 0);
-    let name = "";
-    if (last_admin_index === 0) {
-      name = item["country"];
+    let name = item["name"];
+    if (
+      !item?.hasOwnProperty("admin1") ||
+      !item?.hasOwnProperty("admin2") ||
+      item["admin1"] === item["name"]
+    ) {
+      name += item["country"];
     } else {
-      let admin_key = `admin${last_admin_index}`;
-      if (
-        processedData?.length > 0 &&
-        processedData?.every((ele) => ele.name === item[admin_key])
-      ) {
-        let prevIndex = `admin${last_admin_index--}`;
-        name = `${item[prevIndex]} , ${item["country"]}`;
-      } else {
-        name = `${item[admin_key]} , ${item["country"]}`;
-      }
+      name += `, ${item["admin2"]}, ${item["admin1"]}, ${item["country"]}`;
     }
 
     processedData?.push({
@@ -135,4 +124,30 @@ export const getCurrentLocationDetails = async (latitude, longitude) => {
   return `${townOrProvince || ""},
     ${response?.address?.state},
     ${response?.address?.country}`;
+};
+
+export const getTempForFavoriteLocation = async (favoriteLocationList) => {
+  let commaSeparatedLatt = favoriteLocationList
+    ?.map((loc) => loc.latitude)
+    .join(",");
+  let commaSeparatedLong = favoriteLocationList
+    ?.map((loc) => loc.longitude)
+    .join(",");
+  const params = {
+    latitude: commaSeparatedLatt,
+    longitude: commaSeparatedLong,
+    current: ["temperature_2m", "weather_code"],
+    temperature_unit: "celsius",
+  };
+  const url = "https://api.open-meteo.com/v1/forecast";
+  const responses = await fetchWeatherApi(url, params).then((res) => res);
+  const data = responses?.map((response, index) => {
+    const current = response.current();
+    return {
+      cityName: favoriteLocationList[index].locationName,
+      temp: Math.round(current.variables(0).value()),
+      weatherCode: current.variables(1).value(),
+    };
+  });
+  return data;
 };

@@ -13,7 +13,7 @@ const Search = (props) => {
 
   const handleOnChangeValue = (e) => {
     let value = e.target.value;
-    setSearchValue(value?.trim() || "");
+    setSearchValue(value || "");
   };
 
   const onOptionClick = (item) => {

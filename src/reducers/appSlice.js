@@ -8,6 +8,7 @@ const initialState = {
   dailyForcast: [],
   hourlyForcast: [],
   currentWeatherInfo: {},
+  favoriteLocations: [], //[{ longitude: "", latitude: "", locationName: "" }]
 };
 
 export const appSlice = createSlice({
@@ -47,6 +48,10 @@ export const appSlice = createSlice({
         };
       });
     },
+
+    setFavoriteLocations: (state, action) => {
+      state.favoriteLocations = action.payload;
+    },
   },
 });
 
@@ -56,6 +61,7 @@ export const {
   setHourlyForcast,
   setDailyForcast,
   setCurrentWeatherInfo,
+  setFavoriteLocations,
 } = appSlice.actions;
 
 export default appSlice.reducer;
