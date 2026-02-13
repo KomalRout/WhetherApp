@@ -1,0 +1,24 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+design/
+
+# Logs
+npm-debug.log*
+
+# OS files
+.DS_Store
+
+# Environment variables
+.env
+
+# IDE files
+.vscode/
+.idea/
+
+# Misc
+coverage/
+*.tgz
