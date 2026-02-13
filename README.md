@@ -1,7 +1,7 @@
 # Weather App
 
 This is a weather application built using React. It allows users to search for weather information, view current conditions, and explore forecasts.
-(./preview.jpg)
+![Design preview for the Weather app coding challenge](./preview.jpg)
 
 ## Features
 
