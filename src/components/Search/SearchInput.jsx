@@ -6,7 +6,7 @@ import { fetchLocationData } from "../../service";
 import { CircleLoader } from "../Loader/Loader";
 import { Input, InputAdornment, TextField } from "@mui/material";
 
-const Search = (props) => {
+const SearchInput = (props) => {
   const [searchValue, setSearchValue] = useState("");
   const [data, setData] = useState(new Set());
   const dispatch = useDispatch();
@@ -25,6 +25,7 @@ const Search = (props) => {
 
   useEffect(() => {
     if (searchValue === "") {
+      props?.setSearchFound(true);
       setData(new Set());
       setSearchValue("");
       return;
@@ -57,7 +58,7 @@ const Search = (props) => {
           autoComplete="off"
           startAdornment={
             <InputAdornment position="start">
-              <img alt="search" src="public/assets/images/icon-search.svg" />
+              <img alt="search" src="/assets/images/icon-search.svg" />
             </InputAdornment>
           }
           disableUnderline
@@ -105,4 +106,4 @@ const Search = (props) => {
   );
 };
 
-export default Search;
+export default SearchInput;

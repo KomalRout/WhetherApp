@@ -1,34 +1,79 @@
-import { Delete } from "@mui/icons-material";
-import { Box, List } from "@mui/material";
-import React, { use, useEffect } from "react";
+import { Delete, Warning } from "@mui/icons-material";
+import React, { useEffect, useState } from "react";
 import { getTempForFavoriteLocation } from "../../service";
+import WeatherIcon from "../WeatherIconAndAnimation/WeatherIcon";
+import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined";
+import "./SavedLocationList.css";
 
-const SavedLocationList = () => {
+const SavedLocationList = ({ unitType }) => {
   const favoriteLocationList = JSON.parse(
     localStorage.getItem("favoriteLocations"),
   );
-  const [updatedFavLocList, setUpdatedFavLocList] = React.useState([]);
-
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(async () => {
-      let data = await getTempForFavoriteLocation(favoriteLocationList);
-      setUpdatedFavLocList(data);
-    }, 500);
-    return () => clearTimeout(delayDebounceFn);
-  }, []);
+  const [updatedFavLocList, setUpdatedFavLocList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   console.log(updatedFavLocList);
 
-  return (
-    updatedFavLocList &&
-    updatedFavLocList.length > 0 &&
-    (updatedFavLocList ?? []).map((location, index) => (
-      <List key={index}>
-        {location.cityName} - {location.temp}°C
-        <Delete />
-      </List>
-    ))
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      let data = await getTempForFavoriteLocation(
+        favoriteLocationList,
+        unitType,
+      );
+      setUpdatedFavLocList(data);
+      //localStorage.setItem("favoriteLocations", JSON.stringify(data));
+    } catch (error) {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteFavLocation = (id) => {
+    let updatedFavLocs = favoriteLocationList.filter((loc) => loc.id !== id);
+    localStorage.setItem("favoriteLocations", JSON.stringify(updatedFavLocs));
+    setUpdatedFavLocList((prev) => prev.filter((loc) => loc.id !== id));
+  };
+
+  if (error) {
+    return (
+      <div className="no-list">
+        <Warning />
+        <p>Error fetching data. Please try again later.</p>
+      </div>
+    );
+  }
+  return !loading ? (
+    updatedFavLocList.length > 0 ? (
+      updatedFavLocList.map((location, index) => (
+        <li key={location.id} className={`save-location-item`}>
+          <p className="city-name">{location.cityName}</p>
+          <div className="save-location-item-temp-info">
+            <WeatherIcon code={location.weatherCode} />
+            <p className="temp">{location.temp}°</p>
+          </div>
+          <Delete
+            titleAccess="delete"
+            onClick={() => deleteFavLocation(location.id)}
+          />
+        </li>
+      ))
+    ) : (
+      <div className="no-list">
+        <InboxOutlinedIcon fontSize="large" />
+        <p>No List</p>
+      </div>
+    )
+  ) : (
+    <div className="falback-loader">
+      <p>Loading...</p>
+    </div>
   );
 };
 
-export default SavedLocationList;
+export default React.memo(SavedLocationList);

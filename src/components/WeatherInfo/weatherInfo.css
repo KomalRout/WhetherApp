@@ -1,0 +1,104 @@
+.weather-info {
+  position: relative;
+  display: flex;
+  background-image: url("assets/images/bg-today-small.svg");
+  flex-direction: column;
+  padding: 10px;
+}
+
+.favorite-icon {
+  width: fit-content;
+  height: fit-content;
+  position: absolute;
+  transform: translate(294px, 3px);
+  cursor: pointer;
+}
+
+.location-info {
+  display: flex;
+  gap: 12px;
+  flex-direction: column;
+  text-align: center;
+}
+
+.location-title {
+  font-family: "DMSans-Bold";
+  font-size: 28px;
+}
+
+.location-time {
+  font-family: "DMSans-Medium";
+  font-size: 18px;
+  line-height: 120%;
+  opacity: 80%;
+}
+
+.temperature-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.temperature-info > p {
+  font-family: "DMSans-SemiBoldItalic";
+  font-size: 96px;
+}
+
+.temperature-info > img {
+  width: 120px;
+  height: 120px;
+}
+
+@media (min-width: 1024px) {
+  .weather-info {
+    flex-direction: row;
+    padding: 0px;
+    min-height: 286px;
+    background-image: url("assets/images/bg-today-large.svg");
+  }
+
+  .location-info {
+    transform: translate(40px, 108px);
+    width: 430px;
+    height: 68px;
+    text-align: left;
+  }
+
+  .temperature-info {
+    width: 294px;
+    height: 120px;
+    transform: translate(73px, 83px);
+    text-align: left;
+  }
+
+  .favorite-icon {
+    transform: translate(762px, 10px);
+  }
+}
+
+@media (min-width: 768px) {
+  .weather-info {
+    flex-direction: row;
+    padding: 0px;
+    min-height: 286px;
+    background-image: url("assets/images/bg-today-large.svg");
+  }
+
+  .favorite-icon {
+    transform: translate(682px, 10px);
+  }
+
+  .location-info {
+    transform: translate(40px, 108px);
+    width: 360px;
+    height: 68px;
+    text-align: left;
+  }
+
+  .temperature-info {
+    width: 294px;
+    height: 120px;
+    transform: translate(73px, 83px);
+    text-align: left;
+  }
+}

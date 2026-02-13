@@ -94,9 +94,12 @@ export const fetchLocationData = async (query) => {
     if (
       !item?.hasOwnProperty("admin1") ||
       !item?.hasOwnProperty("admin2") ||
-      item["admin1"] === item["name"]
+      item["name"]?.toLowerCase().trim() !==
+        item["name"].toLowerCase().trim() ||
+      item["admin1"]?.toLowerCase().trim() ===
+        item["country"].toLowerCase().trim()
     ) {
-      name += item["country"];
+      name += "," + item["country"];
     } else {
       name += `, ${item["admin2"]}, ${item["admin1"]}, ${item["country"]}`;
     }
@@ -121,12 +124,13 @@ export const getCurrentLocationDetails = async (latitude, longitude) => {
     response?.address?.county ||
     response?.address?.state_district;
 
-  return `${townOrProvince || ""},
-    ${response?.address?.state},
-    ${response?.address?.country}`;
+  return `${townOrProvince || ""},${response?.address?.state},${response?.address?.country}`;
 };
 
-export const getTempForFavoriteLocation = async (favoriteLocationList) => {
+export const getTempForFavoriteLocation = async (
+  favoriteLocationList,
+  unitType,
+) => {
   let commaSeparatedLatt = favoriteLocationList
     ?.map((loc) => loc.latitude)
     .join(",");
@@ -137,16 +141,17 @@ export const getTempForFavoriteLocation = async (favoriteLocationList) => {
     latitude: commaSeparatedLatt,
     longitude: commaSeparatedLong,
     current: ["temperature_2m", "weather_code"],
-    temperature_unit: "celsius",
+    temperature_unit: unitType === "metric" ? "celsius" : "fahrenheit",
   };
   const url = "https://api.open-meteo.com/v1/forecast";
   const responses = await fetchWeatherApi(url, params).then((res) => res);
   const data = responses?.map((response, index) => {
     const current = response.current();
     return {
-      cityName: favoriteLocationList[index].locationName,
+      cityName: favoriteLocationList[index].locationName?.trim(),
       temp: Math.round(current.variables(0).value()),
       weatherCode: current.variables(1).value(),
+      id: favoriteLocationList[index].id,
     };
   });
   return data;

@@ -1,0 +1,47 @@
+.save-location-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--neutral-700);
+  font-family: "DMSans-SemiBold";
+  border: 1px solid var(--neutral-600);
+  border-radius: 8px;
+  padding: 10px;
+}
+.save-location-item-temp-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.save-location-item-temp-info > img {
+  width: 40px;
+  height: 40px;
+}
+
+.save-location-item-temp-info .temp {
+  font-family: "DMSans-SemiBoldItalic";
+}
+.falback-loader {
+  width: 100%;
+  height: 100%;
+  justify-items: center;
+  align-content: center;
+}
+
+.no-list {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  font-family: "DMSans-SemiBold";
+}
+
+.city-name {
+  width: 250px;
+  text-overflow: ellipsis;
+  overflow-wrap: break-word;
+}

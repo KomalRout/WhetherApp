@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import "./dropdown.css";
 import {
   ClickAwayListener,
@@ -35,7 +35,7 @@ const Dropdown = ({ options, label, icon, onChange, ...props }) => {
             {label}
           </span>
         )}
-        <img alt="dropdown" src="public/assets/images/icon-dropdown.svg" />
+        <img alt="dropdown" src="/assets/images/icon-dropdown.svg" />
       </button>
       <Popover
         elevation={0}
@@ -84,7 +84,7 @@ const Dropdown = ({ options, label, icon, onChange, ...props }) => {
                           {subOption?.selected && (
                             <img
                               alt="checkmark"
-                              src="public/assets/images/icon-checkmark.svg"
+                              src="/assets/images/icon-checkmark.svg"
                             />
                           )}
                         </MenuItem>
@@ -114,4 +114,4 @@ const Dropdown = ({ options, label, icon, onChange, ...props }) => {
   );
 };
 
-export default Dropdown;
+export default React.memo(Dropdown);
