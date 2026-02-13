@@ -13,7 +13,7 @@ const APIError = () => {
       </p>
       <button className="retry-btn" type="button" onClick={onRetryBtnClick}>
         <span>
-          <img src="assets/images/icon-retry.svg" />
+          <img src="public/assets/images/icon-retry.svg" />
         </span>
         <span>Retry</span>
       </button>
