@@ -8,7 +8,6 @@ const initialState = {
   dailyForcast: [],
   hourlyForcast: [],
   currentWeatherInfo: {},
-  favoriteLocations: [], //[{ longitude: "", latitude: "", locationName: "" }]
 };
 
 export const appSlice = createSlice({
@@ -47,10 +46,6 @@ export const appSlice = createSlice({
           weather_code: weather_code[index],
         };
       });
-    },
-
-    setFavoriteLocations: (state, action) => {
-      state.favoriteLocations = action.payload;
     },
   },
 });

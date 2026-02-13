@@ -7,7 +7,12 @@ const SavedLocation = ({ handleFavBtnClick, unitType }) => {
     importDelay(() => import("./SavedLocationList")),
   );
   return (
-    <Drawer anchor={"right"} open={true} onClose={handleFavBtnClick}>
+    <Drawer
+      anchor={"right"}
+      open={true}
+      onClose={handleFavBtnClick}
+      aria-label="Saved Locations Drawer"
+    >
       <Box
         sx={{
           width: 500,
@@ -19,10 +24,14 @@ const SavedLocation = ({ handleFavBtnClick, unitType }) => {
           flexDirection: "column",
         }}
         role="presentation"
+        aria-label="Saved Locations Content"
       >
         <Suspense
           fallback={
-            <div className="falback-loader">
+            <div
+              className="falback-loader"
+              aria-label="Loading Saved Locations"
+            >
               <LinearLoader />
             </div>
           }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import "./App.css";
 import Dropdown from "./components/Dropdown/Dropdown";
 import SearchInput from "./components/Search/SearchInput";
@@ -7,7 +7,6 @@ import { fetchWeatherData } from "./service";
 import {
   setCurrentWeatherInfo,
   setDailyForcast,
-  setFavoriteLocations,
   setHourlyForcast,
 } from "./reducers/appSlice";
 import WeatherIcon from "./components/WeatherIconAndAnimation/WeatherIcon";
@@ -17,6 +16,8 @@ import { useGeoLocation } from "./useGeoLocation";
 import SavedLocation from "./components/SavedLocation/SavedLocation";
 import { daysOfWeek, unit_options } from "./constants";
 import WeatherInfo from "./components/WeatherInfo/WeatherInfo";
+import DailyForcastList from "./components/DailyForcast/DailyForcastList";
+import HourlyForcastList from "./components/HourlyForcast/HourlyForcastList";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -36,10 +37,8 @@ const App = () => {
   const [searchFound, setSearchFound] = useState(true);
 
   const [savedLocBtnClicked, setSavedLocBtnClicked] = useState(false);
-  const storedFavLocs =
-    JSON.parse(localStorage.getItem("favoriteLocations"))?.map(
-      (loc) => loc.locationName,
-    ) || [];
+  const storedLocation = JSON.parse(localStorage.getItem("favoriteLocations"));
+  const storedFavLocs = storedLocation?.map((loc) => loc.locationName) || [];
 
   const state = useSelector((state) => state.appReducer);
   const dailyForcast = state.dailyForcast;
@@ -78,9 +77,7 @@ const App = () => {
 
   let isFavLocation =
     storedFavLocs.includes(location) &&
-    JSON.parse(localStorage.getItem("favoriteLocations"))?.find(
-      (loc) => loc.locationName === location,
-    )?.isFav;
+    storedLocation?.find((loc) => loc.locationName === location)?.isFav;
 
   //Called if theres any change in Location or Unit Type. Also called on initial load when location is fetched.
   useEffect(() => {
@@ -159,19 +156,17 @@ const App = () => {
   const handleFavoriteLocationList = () => {
     setFavoriteBtnClicked(!favoriteBtnClicked);
     let updatedFavList;
-    let favoriteLocations =
-      JSON.parse(localStorage.getItem("favoriteLocations")) || [];
-    let isFavLocationCreated = favoriteLocations?.length > 0;
+    let isFavLocationCreated = storedLocation?.length > 0;
     let isLocationFav =
       isFavLocationCreated &&
-      favoriteLocations?.some((loc) => loc.locationName === location);
+      storedLocation?.some((loc) => loc.locationName === location);
     if (isFavLocationCreated) {
-      let index = favoriteLocations.findIndex(
+      let index = storedLocation.findIndex(
         (loc) => loc.locationName === location,
       );
       if (!isLocationFav) {
         updatedFavList = [
-          ...favoriteLocations,
+          ...storedLocation,
           {
             id: `${location}-${storedFavLocs?.length + 1}`,
             locationName: location,
@@ -181,8 +176,8 @@ const App = () => {
           },
         ];
       } else {
-        updatedFavList = favoriteLocations.filter(
-          (loc) => loc.id !== favoriteLocations[index].id,
+        updatedFavList = storedLocation.filter(
+          (loc) => loc.id !== storedLocation[index].id,
         );
       }
     } else {
@@ -201,7 +196,7 @@ const App = () => {
 
   return (
     <div className="wheather-app-container">
-      <header>
+      <header aria-label="App Header">
         <img alt="weather-logo" src="assets/images/logo.svg" />
         <div className="header-right-content">
           <img
@@ -209,12 +204,14 @@ const App = () => {
             alt="frequently-viewed"
             src="assets/images/icon-saved.svg"
             onClick={onSavedLocClick}
+            aria-label="Saved Locations"
           />
           <Dropdown
             options={unit}
             label={"Unit"}
             onChange={(val) => setUnitType(val)}
             icon={"assets/images/icon-units.svg"}
+            aria-label="Unit Selector"
           />
         </div>
       </header>
@@ -274,34 +271,9 @@ const App = () => {
                       {(dailyForcast?.length > 0
                         ? dailyForcast
                         : Array.from({ length: 7 })
-                      ).map((daily, index) => {
-                        return (
-                          <div
-                            id={`daily-forcast-${index}`}
-                            key={`daily-forcast-${index}`}
-                            className={`forcast-item card-item ${
-                              !daily ? "loading" : ""
-                            }`}
-                          >
-                            {daily ? (
-                              <>
-                                <p className="day-label">{daily.day}</p>
-                                <WeatherIcon code={daily.weather_code} />
-                                <div className="temp-range">
-                                  <p className="temp-range-value">
-                                    {daily.temperature_max + "°"}
-                                  </p>
-                                  <p className="temp-range-value">
-                                    {daily.temperature_min + "°"}
-                                  </p>
-                                </div>
-                              </>
-                            ) : (
-                              <></>
-                            )}
-                          </div>
-                        );
-                      })}
+                      ).map((daily, index) => (
+                        <DailyForcastList daily={daily} index={index} />
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -320,29 +292,9 @@ const App = () => {
                     {(hourlyForcast.length > 0
                       ? filteredHourlyForcast
                       : Array.from({ length: 10 })
-                    )?.map((item, index) => {
-                      return (
-                        <div
-                          id={`hourly-forcast-item-${index}`}
-                          className={`hourly-forcast-item ${
-                            !item ? "loading" : ""
-                          }`}
-                          key={`hourly-forcast-item-${index}`}
-                        >
-                          {item ? (
-                            <>
-                              <WeatherIcon code={item.weather_code} />
-                              <p className="hourly-forecast-text">
-                                {item.time_stamp}
-                              </p>
-                              <p className="hourly-forecast-temp">{`${item.temperature}°`}</p>
-                            </>
-                          ) : (
-                            <></>
-                          )}
-                        </div>
-                      );
-                    })}
+                    )?.map((item, index) => (
+                      <HourlyForcastList item={item} index={index} />
+                    ))}
                   </div>
                 </div>
               </div>
@@ -354,9 +306,13 @@ const App = () => {
       ) : (
         <APIError />
       )}
-      <footer>
+      <footer aria-label="App Footer">
         <div className="attribution">
-          Coded by <a href="#">Komal Rout</a>.
+          Coded by{" "}
+          <a href="#" aria-label="Komal Rout">
+            Komal Rout
+          </a>
+          .
         </div>
       </footer>
       {savedLocBtnClicked && (

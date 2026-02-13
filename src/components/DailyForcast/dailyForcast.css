@@ -1,0 +1,45 @@
+.forcast-item {
+  width: 80.57px;
+  height: 133px;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 10px;
+  gap: 16px;
+  align-items: center;
+}
+
+.forcast-item > img {
+  width: 60px;
+  height: 60px;
+  align-self: center;
+}
+
+.temp-range {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.temp-range-value {
+  font-family: "DMSans-Medium";
+  font-size: 16px;
+  line-height: 120%;
+}
+
+.day-label {
+  font-family: "DMSans-Medium";
+  font-size: 18px;
+  line-height: 120%;
+}
+
+@media (min-width: 768px) {
+  .forcast-item {
+    width: 69.14px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .forcast-item {
+    width: 80.57px;
+  }
+}

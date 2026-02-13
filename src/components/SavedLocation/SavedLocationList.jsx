@@ -42,8 +42,8 @@ const SavedLocationList = ({ unitType }) => {
 
   if (error) {
     return (
-      <div className="no-list">
-        <Warning />
+      <div className="no-list" aria-label="No Saved Locations">
+        <Warning aria-hidden="true" />
         <p>Error fetching data. Please try again later.</p>
       </div>
     );
@@ -51,20 +51,25 @@ const SavedLocationList = ({ unitType }) => {
   return !loading ? (
     updatedFavLocList.length > 0 ? (
       updatedFavLocList.map((location, index) => (
-        <li key={location.id} className={`save-location-item`}>
+        <li
+          key={location.id}
+          className={`save-location-item`}
+          aria-label={`Saved location: ${location.cityName}`}
+        >
           <p className="city-name">{location.cityName}</p>
           <div className="save-location-item-temp-info">
-            <WeatherIcon code={location.weatherCode} />
+            <WeatherIcon code={location.weatherCode} aria-hidden="true" />
             <p className="temp">{location.temp}°</p>
           </div>
           <Delete
             titleAccess="delete"
             onClick={() => deleteFavLocation(location.id)}
+            aria-label={`Delete saved location: ${location.cityName}`}
           />
         </li>
       ))
     ) : (
-      <div className="no-list">
+      <div className="no-list" aria-label="No Saved Locations">
         <InboxOutlinedIcon fontSize="large" />
         <p>No List</p>
       </div>
