@@ -197,12 +197,12 @@ const App = () => {
   return (
     <div className="wheather-app-container">
       <header aria-label="App Header">
-        <img alt="weather-logo" src="/assets/images/logo.svg" />
+        <img alt="weather-logo" src="public/assets/images/logo.svg" />
         <div className="header-right-content">
           <img
             className="favorite-list-icon"
             alt="frequently-viewed"
-            src="/assets/images/icon-saved.svg"
+            src="public/assets/images/icon-saved.svg"
             onClick={onSavedLocClick}
             aria-label="Saved Locations"
           />
@@ -210,7 +210,7 @@ const App = () => {
             options={unit}
             label={"Unit"}
             onChange={(val) => setUnitType(val)}
-            icon={"/assets/images/icon-units.svg"}
+            icon={"public/assets/images/icon-units.svg"}
             aria-label="Unit Selector"
           />
         </div>

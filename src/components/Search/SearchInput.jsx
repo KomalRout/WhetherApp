@@ -58,7 +58,7 @@ const SearchInput = (props) => {
           autoComplete="off"
           startAdornment={
             <InputAdornment position="start">
-              <img alt="search" src="/assets/images/icon-search.svg" />
+              <img alt="search" src="public/assets/images/icon-search.svg" />
             </InputAdornment>
           }
           disableUnderline
