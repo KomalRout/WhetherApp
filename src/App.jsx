@@ -18,7 +18,7 @@ import { daysOfWeek, unit_options } from "./constants";
 import WeatherInfo from "./components/WeatherInfo/WeatherInfo";
 import DailyForcastList from "./components/DailyForcast/DailyForcastList";
 import HourlyForcastList from "./components/HourlyForcast/HourlyForcastList";
-
+import logo from "/assets/images/logo.svg";
 const App = () => {
   const dispatch = useDispatch();
   const [unitType, setUnitType] = useState("metric");
@@ -197,12 +197,14 @@ const App = () => {
   return (
     <div className="wheather-app-container">
       <header aria-label="App Header">
-        <img alt="weather-logo" src="public/assets/images/logo.svg" />
+        <img alt="weather-logo" src={logo} />
         <div className="header-right-content">
           <img
             className="favorite-list-icon"
             alt="frequently-viewed"
-            src="public/assets/images/icon-saved.svg"
+            src={
+              import.meta.env.REACT_BASE_URL + "/assets/images/icon-saved.svg"
+            }
             onClick={onSavedLocClick}
             aria-label="Saved Locations"
           />
