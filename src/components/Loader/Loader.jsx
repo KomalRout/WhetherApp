@@ -4,7 +4,7 @@ const CircleLoader = () => {
   return (
     <img
       className="circle-loader-container"
-      src="public/assets/images/icon-loading.svg"
+      src="/assets/images/icon-loading.svg"
     />
   );
 };
