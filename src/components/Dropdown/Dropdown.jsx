@@ -9,7 +9,8 @@ import {
   MenuItem,
   MenuList,
 } from "@mui/material";
-
+import dropdown from "/assets/images/icon-dropdown.svg";
+import checkmark from "/assets/images/icon-checkmark.svg";
 const Dropdown = ({ options, label, icon, onChange, ...props }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -35,81 +36,80 @@ const Dropdown = ({ options, label, icon, onChange, ...props }) => {
             {label}
           </span>
         )}
-        <img alt="dropdown" src="public/assets/images/icon-dropdown.svg" />
+        <img alt="dropdown" src={dropdown} />
       </button>
-      <Popover
-        elevation={0}
-        id="positioned-menu"
-        aria-labelledby="demo-positioned-button"
-        anchorEl={anchorEl}
-        open={open && options?.length > 0}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "center",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
-        }}
-        classes={{ paper: "custom-dropdown-popper" }}
-      >
-        <ClickAwayListener onClickAway={handleClose}>
-          <MenuList
-            className="custom-dropdown-list"
-            disablePadding={true}
-            id="menu-list"
-          >
-            {options.map((option) => {
-              let isGroupHeader = option.hasOwnProperty("group");
-              if (isGroupHeader) {
+      {open && (
+        <Popover
+          elevation={0}
+          id="positioned-menu"
+          aria-labelledby="demo-positioned-button"
+          anchorEl={anchorEl}
+          open={open && options?.length > 0}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "center",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "left",
+          }}
+          classes={{ paper: "custom-dropdown-popper" }}
+        >
+          <ClickAwayListener onClickAway={handleClose}>
+            <MenuList
+              className="custom-dropdown-list"
+              disablePadding={true}
+              id="menu-list"
+            >
+              {options.map((option) => {
+                let isGroupHeader = option.hasOwnProperty("group");
+                if (isGroupHeader) {
+                  return (
+                    <div>
+                      <ListSubheader
+                        key={option.group}
+                        sx={{
+                          color: "var(--neutral-300)",
+                          bgcolor: "var(--neutral-800)",
+                        }}
+                      >
+                        {option.groupLabel}
+                      </ListSubheader>
+                      {option.options?.map((subOption) => {
+                        return (
+                          <MenuItem
+                            key={subOption.key}
+                            aria-label={subOption?.key}
+                          >
+                            <ListItemText> {subOption.label} </ListItemText>
+                            {subOption?.selected && (
+                              <img alt="checkmark" src={checkmark} />
+                            )}
+                          </MenuItem>
+                        );
+                      })}
+                      {option !== options[options.length - 1] && (
+                        <Divider className="divider" />
+                      )}
+                    </div>
+                  );
+                }
                 return (
-                  <div>
-                    <ListSubheader
-                      key={option.group}
-                      sx={{
-                        color: "var(--neutral-300)",
-                        bgcolor: "var(--neutral-800)",
-                      }}
-                    >
-                      {option.groupLabel}
-                    </ListSubheader>
-                    {option.options?.map((subOption) => {
-                      return (
-                        <MenuItem
-                          key={subOption.key}
-                          aria-label={subOption?.key}
-                        >
-                          <ListItemText> {subOption.label} </ListItemText>
-                          {subOption?.selected && (
-                            <img
-                              alt="checkmark"
-                              src="public/assets/images/icon-checkmark.svg"
-                            />
-                          )}
-                        </MenuItem>
-                      );
-                    })}
-                    {option !== options[options.length - 1] && (
-                      <Divider className="divider" />
-                    )}
-                  </div>
+                  <MenuItem
+                    key={option.key}
+                    aria-label={option?.key}
+                    onClick={handleClick}
+                    value={option.key}
+                  >
+                    {option.label}
+                  </MenuItem>
                 );
-              }
-              return (
-                <MenuItem
-                  key={option.key}
-                  aria-label={option?.key}
-                  onClick={handleClick}
-                  value={option.key}
-                >
-                  {option.label}
-                </MenuItem>
-              );
-            })}
-          </MenuList>
-        </ClickAwayListener>
-      </Popover>
+              })}
+            </MenuList>
+          </ClickAwayListener>
+        </Popover>
+      )}
     </div>
   );
 };

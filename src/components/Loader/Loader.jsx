@@ -1,11 +1,8 @@
 import "./circleLoader.css";
-
+import loading from "/assets/images/icon-loading.svg";
 const CircleLoader = () => {
   return (
-    <img
-      className="circle-loader-container"
-      src="public/assets/images/icon-loading.svg"
-    />
+    <img alt="loading" className="circle-loader-container" src={loading} />
   );
 };
 

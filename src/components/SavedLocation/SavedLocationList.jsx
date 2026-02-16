@@ -13,8 +13,6 @@ const SavedLocationList = ({ unitType }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  console.log(updatedFavLocList);
-
   useEffect(() => {
     fetchData();
   }, []);

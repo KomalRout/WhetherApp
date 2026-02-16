@@ -9,7 +9,6 @@ import {
   setDailyForcast,
   setHourlyForcast,
 } from "./reducers/appSlice";
-import WeatherIcon from "./components/WeatherIconAndAnimation/WeatherIcon";
 import { LinearLoader } from "./components/Loader/Loader";
 import APIError from "./components/APIError/APIError";
 import { useGeoLocation } from "./useGeoLocation";
@@ -19,13 +18,16 @@ import WeatherInfo from "./components/WeatherInfo/WeatherInfo";
 import DailyForcastList from "./components/DailyForcast/DailyForcastList";
 import HourlyForcastList from "./components/HourlyForcast/HourlyForcastList";
 import logo from "/assets/images/logo.svg";
+import saved from "/assets/images/icon-saved.svg";
+import units from "/assets/images/icon-units.svg";
+
 const App = () => {
   const dispatch = useDispatch();
   const [unitType, setUnitType] = useState("metric");
   const [error, setError] = useState(false);
   const { refresh, error: locationError } = useGeoLocation();
 
-  const [unit, setUnit] = useState([]);
+  const [unit, setUnit] = useState(unit_options);
 
   const todaysDay = new Date().toLocaleDateString("en-US", {
     weekday: "short",
@@ -128,30 +130,32 @@ const App = () => {
     setFilteredHourlyForcast(filteredData);
   }
 
-  //Unit Change Callback function
-  useCallback(
-    (val) => {
-      let unit_keys = unit_options?.filter((item) => item.key === val)[0][val];
-      let modified = unit_options
-        ?.filter((item) => item.key !== val)
-        ?.map((item) => {
-          if (item?.hasOwnProperty("group")) {
-            item.options = item.options?.map((opt) => {
-              if (unit_keys?.includes(opt.key)) {
-                opt.selected = true;
-              } else {
-                opt.selected = false;
-              }
-              return opt;
-            });
-            return item;
-          }
+  const updateUnitOptions = useCallback(() => {
+    console.log("unit type", unitType);
+    let unit_keys =
+      unit_options?.filter((item) => item.key === unitType)[0][unitType] || [];
+    let modified = unit_options
+      ?.filter((item) => item.key !== unitType)
+      ?.map((item) => {
+        if (item?.hasOwnProperty("group")) {
+          item.options = item.options?.map((opt) => {
+            if (unit_keys?.includes(opt.key)) {
+              opt.selected = true;
+            } else {
+              opt.selected = false;
+            }
+            return opt;
+          });
           return item;
-        });
-      setUnit(modified);
-    },
-    [unitType],
-  );
+        }
+        return item;
+      });
+    setUnit(modified);
+  }, [unitType]);
+
+  useEffect(() => {
+    updateUnitOptions();
+  }, [updateUnitOptions]);
 
   const handleFavoriteLocationList = () => {
     setFavoriteBtnClicked(!favoriteBtnClicked);
@@ -202,17 +206,17 @@ const App = () => {
           <img
             className="favorite-list-icon"
             alt="frequently-viewed"
-            src={
-              import.meta.env.REACT_BASE_URL + "/assets/images/icon-saved.svg"
-            }
+            src={saved}
             onClick={onSavedLocClick}
             aria-label="Saved Locations"
           />
           <Dropdown
             options={unit}
             label={"Unit"}
-            onChange={(val) => setUnitType(val)}
-            icon={"public/assets/images/icon-units.svg"}
+            onChange={(val) => {
+              setUnitType(val);
+            }}
+            icon={units}
             aria-label="Unit Selector"
           />
         </div>
