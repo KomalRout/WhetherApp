@@ -1,7 +1,7 @@
 .weather-info {
   position: relative;
   display: flex;
-  background-image: url("assets/images/bg-today-small.svg");
+  background-image: url("/assets/images/bg-today-small.svg");
   flex-direction: column;
   padding: 10px;
 }
@@ -54,7 +54,7 @@
     flex-direction: row;
     padding: 0px;
     min-height: 286px;
-    background-image: url("assets/images/bg-today-large.svg");
+    background-image: url("/assets/images/bg-today-large.svg");
   }
 
   .favorite-icon {
@@ -81,7 +81,7 @@
     flex-direction: row;
     padding: 0px;
     min-height: 286px;
-    background-image: url("assets/images/bg-today-large.svg");
+    background-image: url("/assets/images/bg-today-large.svg");
   }
 
   .location-info {
