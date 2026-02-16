@@ -1,7 +1,7 @@
 .weather-info {
   position: relative;
   display: flex;
-  background-image: url("/assets/images/bg-today-small.svg");
+  background-image: url("/images/bg-today-small.svg");
   flex-direction: column;
   padding: 10px;
 }
