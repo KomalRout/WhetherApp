@@ -49,11 +49,13 @@ This is a weather application built using React. It allows users to search for w
 
 This app can be deployed using platforms like Vercel or Netlify. Ensure the `vite.config.js` is configured for production builds.
 
+Deployed on GitHub Pages: [Your GitHub Pages URL](https://komalrout.github.io/WhetherApp/)
+
 ## Author
 
 - **Komal Rout**
-- GitHub: [komalrout](https://github.com/komalrout)
-- Frontend Mentor: [@komalrout](https://www.frontendmentor.io/profile/komalrout)
+- GitHub: [komalrout](https://github.com/KomalRout)
+- Frontend Mentor: [@komalrout](https://www.frontendmentor.io/profile/KomalRout)
 
 ## Acknowledgments
 
