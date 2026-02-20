@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { setLatLong, setLocation } from "./reducers/appSlice";
-import { getCurrentLocationDetails } from "./service";
+import { setLatLong, setLocation } from "../reducers/appSlice";
+import { getCurrentLocationDetails } from "../service/service";
 
 export const useGeoLocation = () => {
   const dispatch = useDispatch();

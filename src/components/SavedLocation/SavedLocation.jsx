@@ -15,7 +15,12 @@ const SavedLocation = ({ handleFavBtnClick, unitType }) => {
     >
       <Box
         sx={{
-          width: 500,
+          width: {
+            xs: 325,
+            sm: 325,
+            md: 500,
+            lg: 500,
+          },
           background: "var(--neutral-800)",
           height: "100%",
           padding: "20px",

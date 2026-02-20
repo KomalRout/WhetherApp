@@ -3,7 +3,7 @@ import "./App.css";
 import Dropdown from "./components/Dropdown/Dropdown";
 import SearchInput from "./components/Search/SearchInput";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchWeatherData } from "./service";
+import { fetchWeatherData } from "./service/service";
 import {
   setCurrentWeatherInfo,
   setDailyForcast,
@@ -11,9 +11,9 @@ import {
 } from "./reducers/appSlice";
 import { LinearLoader } from "./components/Loader/Loader";
 import APIError from "./components/APIError/APIError";
-import { useGeoLocation } from "./useGeoLocation";
+import { useGeoLocation } from "./utils/useGeoLocation";
 import SavedLocation from "./components/SavedLocation/SavedLocation";
-import { daysOfWeek, unit_options } from "./constants";
+import { daysOfWeek, unit_options } from "./utils/constants";
 import WeatherInfo from "./components/WeatherInfo/WeatherInfo";
 import DailyForcastList from "./components/DailyForcast/DailyForcastList";
 import HourlyForcastList from "./components/HourlyForcast/HourlyForcastList";
