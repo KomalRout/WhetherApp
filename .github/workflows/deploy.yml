@@ -2,26 +2,19 @@
 name: Deploy static content to Pages
 
 on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ['main']
-
-  # Allows you to run this workflow manually from the Actions tab
+  # Manual trigger only
   workflow_dispatch:
 
-# Sets the GITHUB_TOKEN permissions to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow one concurrent deployment
 concurrency:
   group: 'pages'
   cancel-in-progress: true
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
     environment:
       name: github-pages
@@ -29,9 +22,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: [actions/checkout@v4](https://github.com)
       - name: Set up Node
-        uses: actions/setup-node@v6
+        uses: [actions/setup-node@v4](https://github.com)
         with:
           node-version: lts/*
           cache: 'npm'
@@ -42,12 +35,11 @@ jobs:
         env:
           VITE_LOCATIONIQ_API_KEY: ${{ secrets.VITE_LOCATIONIQ_API_KEY }}
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: [actions/configure-pages@v5](https://github.com)
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: [actions/upload-pages-artifact@v3](https://github.com)
         with:
-          # Upload dist folder
           path: './dist'
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: [actions/deploy-pages@v4](https://github.com)
