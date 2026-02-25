@@ -4,7 +4,7 @@ import { setLatLong, setLocation } from "../../reducers/appSlice";
 import { useDispatch } from "react-redux";
 import { fetchLocationData } from "../../service/service";
 import { CircleLoader } from "../Loader/Loader";
-import { Input, InputAdornment, TextField } from "@mui/material";
+import { Input, InputAdornment } from "@mui/material";
 import search from "/assets/images/icon-search.svg";
 
 const SearchInput = (props) => {

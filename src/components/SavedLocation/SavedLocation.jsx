@@ -1,7 +1,7 @@
 import { Drawer, Box } from "@mui/material";
 import React, { Suspense } from "react";
 import { LinearLoader } from "../Loader/Loader";
-import "./SavedLocationList.css";
+import "./savedLocationList.css";
 const SavedLocation = ({ handleFavBtnClick, unitType }) => {
   const MyLazyComponent = React.lazy(
     importDelay(() => import("./SavedLocationList")),

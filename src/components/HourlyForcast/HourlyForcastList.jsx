@@ -1,6 +1,6 @@
 import React from "react";
 import WeatherIcon from "../WeatherIconAndAnimation/WeatherIcon";
-import "./HourlyForcastList.css";
+import "./hourlyForcastList.css";
 
 const HourlyForcastList = ({ item, index }) => {
   return (

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { getTempForFavoriteLocation } from "../../service/service";
 import WeatherIcon from "../WeatherIconAndAnimation/WeatherIcon";
 import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined";
-import "./SavedLocationList.css";
+import "./savedLocationList.css";
 
 const SavedLocationList = ({ unitType }) => {
   const favoriteLocationList = JSON.parse(
