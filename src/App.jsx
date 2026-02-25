@@ -16,10 +16,10 @@ import SavedLocation from "./components/SavedLocation/SavedLocation";
 import { daysOfWeek, unit_options } from "./utils/constants";
 import WeatherInfo from "./components/WeatherInfo/WeatherInfo";
 import DailyForcastList from "./components/DailyForcast/DailyForcastList";
-import HourlyForcastList from "./components/HourlyForcast/HourlyForcastList";
 import logo from "/assets/images/logo.svg";
 import saved from "/assets/images/icon-saved.svg";
 import units from "/assets/images/icon-units.svg";
+import HourlyForcastList from "./components/HourlyForcast/HourlyForcastList";
 
 const App = () => {
   const dispatch = useDispatch();
