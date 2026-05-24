@@ -40,8 +40,8 @@ export const appSlice = createSlice({
       const { time, temperature, weather_code } = action.payload;
       state.hourlyForcast = time?.map((val, index) => {
         return {
-          time_stamp: val?.split(",")[1]?.trim(),
-          key: val?.split(",")[0]?.trim(),
+          time_stamp: val?.split(" ")?.slice(1).join(" "),
+          key: val?.split(" ")[0]?.trim(),
           temperature: Math.round(temperature[index]),
           weather_code: weather_code[index],
         };

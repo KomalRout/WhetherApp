@@ -20,6 +20,7 @@ import logo from "/assets/images/logo.svg";
 import saved from "/assets/images/icon-saved.svg";
 import units from "/assets/images/icon-units.svg";
 import HourlyForcastList from "./components/HourlyForcast/HourlyForcastList";
+//import ChatbotFloatingIcon from "./components/Chatbot/ChatbotFloatingIcon";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -131,7 +132,6 @@ const App = () => {
   }
 
   const updateUnitOptions = useCallback(() => {
-    console.log("unit type", unitType);
     let unit_keys =
       unit_options?.filter((item) => item.key === unitType)[0][unitType] || [];
     let modified = unit_options
@@ -199,135 +199,144 @@ const App = () => {
   };
 
   return (
-    <div className="wheather-app-container">
-      <header aria-label="App Header">
-        <img alt="weather-logo" src={logo} />
-        <div className="header-right-content">
-          <img
-            className="favorite-list-icon"
-            alt="frequently-viewed"
-            src={saved}
-            onClick={onSavedLocClick}
-            aria-label="Saved Locations"
-          />
-          <Dropdown
-            options={unit}
-            label={"Unit"}
-            onChange={(val) => {
-              setUnitType(val);
-            }}
-            icon={units}
-            aria-label="Unit Selector"
-          />
-        </div>
-      </header>
-      {!error || !locationError ? (
-        <section>
-          <div className="title-container">
-            <p className="title">How's the sky looking today?</p>
-          </div>
-          <main className="main-content-container">
-            <SearchInput
-              searchFound={searchFound}
-              setSearchFound={setSearchFound}
+    <>
+      <div className="wheather-app-container">
+        <header aria-label="App Header">
+          <img alt="weather-logo" src={logo} />
+          <div className="header-right-content">
+            <img
+              className="favorite-list-icon"
+              alt="frequently-viewed"
+              src={saved}
+              onClick={onSavedLocClick}
+              aria-label="Saved Locations"
             />
-            {searchFound ? (
-              <div className="content-container">
-                <div className="left-content">
-                  {/* Weather Information Section */}
-                  <div className="weather-info-container ">
-                    {Object.keys(currentForcast)?.length > 0 ? (
-                      <WeatherInfo
-                        location={location}
-                        currentForcast={currentForcast}
-                        favoriteBtnClicked={favoriteBtnClicked}
-                        isFavLocation={isFavLocation}
-                        handleFavoriteLocationList={handleFavoriteLocationList}
-                      />
-                    ) : (
-                      <div className="current-weather-loader">
-                        <LinearLoader />
-                        <p>Loading...</p>
+            <Dropdown
+              options={unit}
+              label={"Unit"}
+              onChange={(val) => {
+                setUnitType(val);
+              }}
+              icon={units}
+              aria-label="Unit Selector"
+            />
+          </div>
+        </header>
+        {!error || !locationError ? (
+          <section>
+            <div className="title-container">
+              <p className="title">How's the sky looking today?</p>
+            </div>
+            <main className="main-content-container">
+              <SearchInput
+                searchFound={searchFound}
+                setSearchFound={setSearchFound}
+              />
+              {searchFound ? (
+                <div className="content-container">
+                  <div className="left-content">
+                    {/* Weather Information Section */}
+                    <div className="weather-info-container ">
+                      {Object.keys(currentForcast)?.length > 0 ? (
+                        <WeatherInfo
+                          location={location}
+                          currentForcast={currentForcast}
+                          favoriteBtnClicked={favoriteBtnClicked}
+                          isFavLocation={isFavLocation}
+                          handleFavoriteLocationList={
+                            handleFavoriteLocationList
+                          }
+                        />
+                      ) : (
+                        <div className="current-weather-loader">
+                          <LinearLoader />
+                          <p>Loading...</p>
+                        </div>
+                      )}
+                      {/* Temperature Details Section */}
+                      <div className="temperature-details">
+                        <div className="detail-item card-item">
+                          <p className="temp-info-title">Feels Like</p>
+                          <p className="temp-info-value">{feelsLike}</p>
+                        </div>
+                        <div className="detail-item card-item">
+                          <p className="temp-info-title">Humidity</p>
+                          <p className="temp-info-value">{humidity}</p>
+                        </div>
+                        <div className="detail-item card-item">
+                          <p className="temp-info-title">Wind</p>
+                          <p className="temp-info-value">{wind}</p>
+                        </div>
+                        <div className="detail-item card-item">
+                          <p className="temp-info-title">Precipitation</p>
+                          <p className="temp-info-value">{precipitation}</p>
+                        </div>
                       </div>
-                    )}
-                    {/* Temperature Details Section */}
-                    <div className="temperature-details">
-                      <div className="detail-item card-item">
-                        <p className="temp-info-title">Feels Like</p>
-                        <p className="temp-info-value">{feelsLike}</p>
-                      </div>
-                      <div className="detail-item card-item">
-                        <p className="temp-info-title">Humidity</p>
-                        <p className="temp-info-value">{humidity}</p>
-                      </div>
-                      <div className="detail-item card-item">
-                        <p className="temp-info-title">Wind</p>
-                        <p className="temp-info-value">{wind}</p>
-                      </div>
-                      <div className="detail-item card-item">
-                        <p className="temp-info-title">Precipitation</p>
-                        <p className="temp-info-value">{precipitation}</p>
+                    </div>
+                    {/* Daily Forcast Section */}
+                    <div className="daily-forcast">
+                      <p className="daily-forcast-title">Daily Forcast</p>
+                      <div className="forcast-details">
+                        {(dailyForcast?.length > 0
+                          ? dailyForcast
+                          : Array.from({ length: 7 })
+                        ).map((daily, index) => (
+                          <DailyForcastList daily={daily} index={index} />
+                        ))}
                       </div>
                     </div>
                   </div>
-                  {/* Daily Forcast Section */}
-                  <div className="daily-forcast">
-                    <p className="daily-forcast-title">Daily Forcast</p>
-                    <div className="forcast-details">
-                      {(dailyForcast?.length > 0
-                        ? dailyForcast
-                        : Array.from({ length: 7 })
-                      ).map((daily, index) => (
-                        <DailyForcastList daily={daily} index={index} />
+                  {/* Hourly Forcast Section */}
+                  <div className="hourly-forecast">
+                    <div className="hourly-forecast-header">
+                      <p className="hourly-forecast-text">Hourly Forecast</p>
+                      <Dropdown
+                        options={hourlyForcast.length > 0 ? daysOfWeek : []}
+                        onChange={(value) => onDaySelect(value)}
+                        todaysDay={todaysDay}
+                        label={selectedDay}
+                      />
+                    </div>
+                    <div className="hourly-forcast-content">
+                      {(hourlyForcast.length > 0
+                        ? filteredHourlyForcast
+                        : Array.from({ length: 10 })
+                      )?.map((item, index) => (
+                        <HourlyForcastList
+                          key={`hourly-forcast-${index}`}
+                          item={item}
+                          index={index}
+                        />
                       ))}
                     </div>
                   </div>
                 </div>
-                {/* Hourly Forcast Section */}
-                <div className="hourly-forecast">
-                  <div className="hourly-forecast-header">
-                    <p className="hourly-forecast-text">Hourly Forecast</p>
-                    <Dropdown
-                      options={hourlyForcast.length > 0 ? daysOfWeek : []}
-                      onChange={(value) => onDaySelect(value)}
-                      todaysDay={todaysDay}
-                      label={selectedDay}
-                    />
-                  </div>
-                  <div className="hourly-forcast-content">
-                    {(hourlyForcast.length > 0
-                      ? filteredHourlyForcast
-                      : Array.from({ length: 10 })
-                    )?.map((item, index) => (
-                      <HourlyForcastList item={item} index={index} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <p>No search results found!</p>
-            )}
-          </main>
-        </section>
-      ) : (
-        <APIError />
-      )}
-      <footer aria-label="App Footer">
-        <div className="attribution">
-          Coded by{" "}
-          <a href="#" aria-label="Komal Rout">
-            Komal Rout
-          </a>
-          .
-        </div>
-      </footer>
-      {savedLocBtnClicked && (
-        <SavedLocation
-          handleFavBtnClick={onSavedLocClick}
-          unitType={unitType}
-        />
-      )}
-    </div>
+              ) : (
+                <p>No search results found!</p>
+              )}
+            </main>
+          </section>
+        ) : (
+          <APIError />
+        )}
+        <footer aria-label="App Footer">
+          <div className="attribution">
+            Coded by{" "}
+            <a href="#" aria-label="Komal Rout">
+              Komal Rout
+            </a>
+            .
+          </div>
+        </footer>
+        {savedLocBtnClicked && (
+          <SavedLocation
+            handleFavBtnClick={onSavedLocClick}
+            unitType={unitType}
+          />
+        )}
+      </div>
+      {/* {<ChatbotFloatingIcon />} */}
+    </>
   );
 };
 

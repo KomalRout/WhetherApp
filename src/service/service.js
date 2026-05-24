@@ -39,7 +39,7 @@ export const fetchWeatherData = async ([longitude, latitude, unitType]) => {
       }),
       windSpeed: Math.round(current.variables(0).value()),
       precipitation: parseFloat(current.variables(1).value()).toFixed(1),
-      humidity: current.variables(2).value(),
+      humidity: Math.round(current.variables(2).value()),
       apparent_temperature: Math.round(current.variables(3).value()),
       temperature: Math.round(current.variables(4).value()),
       weather_code: current.variables(6).value(),
@@ -156,3 +156,15 @@ export const getTempForFavoriteLocation = async (
   });
   return data;
 };
+
+export async function sendQuery(query) {
+  const res = await fetch("http://localhost:8000/api/chat/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query }),
+  }).then((res) => res?.json());
+
+  return res;
+}
