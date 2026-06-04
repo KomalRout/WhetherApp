@@ -23,25 +23,48 @@ export function useWeatherAgent() {
           body: JSON.stringify({ query: text, session_id: sessionId.current }),
         });
 
+        // Handle HTTP-level errors (429 quota, 500 server error, etc.)
+        if (res.status === 429) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              content: null,
+              error: "quota_exceeded",
+            },
+          ]);
+          setLoading(false);
+          return;
+        }
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
+        let done = false;
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+        while (!done) {
+          const { done: streamDone, value } = await reader.read();
+          done = streamDone;
+          if (!value) continue;
 
           const lines = decoder.decode(value, { stream: true }).split("\n");
+
           for (const line of lines) {
+            // skip non-data lines
             if (!line.startsWith("data: ")) continue;
+
             try {
-              const event = JSON.parse(line.slice(6));
-              if (event.type === "session")
+              const event = JSON.parse(line.slice(6)); // parse first
+
+              if (event.type === "session") {
                 sessionId.current = event.session_id;
-              if (event.type === "tool_call")
+              }
+
+              if (event.type === "tool_call") {
                 setSteps((s) => [...s, { ...event, status: "calling" }]);
-              if (event.type === "tool_result")
+              }
+
+              if (event.type === "tool_result") {
                 setSteps((s) =>
                   s.map((step) =>
                     step.tool === event.tool && step.status === "calling"
@@ -49,6 +72,8 @@ export function useWeatherAgent() {
                       : step,
                   ),
                 );
+              }
+
               if (event.type === "answer") {
                 setMessages((prev) => [
                   ...prev,
@@ -56,17 +81,33 @@ export function useWeatherAgent() {
                 ]);
                 setLoading(false);
               }
-            } catch {}
+
+              // Handle agent-level errors streamed from backend
+              if (event.type === "error") {
+                setMessages((prev) => [
+                  ...prev,
+                  {
+                    role: "assistant",
+                    content: null,
+                    error: event.code ?? "unknown",
+                  },
+                ]);
+                setLoading(false);
+                return;
+              }
+            } catch {
+              // silently skip malformed SSE lines
+            }
           }
         }
       } catch (err) {
+        // Network error or thrown HTTP error
         setMessages((prev) => [
           ...prev,
           {
             role: "assistant",
-            content:
-              "Sorry, I couldn't reach the weather service. Please try again.",
-            error: true,
+            content: null,
+            error: "unknown",
           },
         ]);
         setLoading(false);

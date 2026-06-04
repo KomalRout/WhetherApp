@@ -9,6 +9,24 @@ const SUGGESTIONS = [
   "⏰  Best time to go outside in Pune today?",
 ];
 
+const ERROR_MESSAGES = {
+  quota_exceeded: {
+    icon: "⚠️",
+    title: "API quota exceeded",
+    body: "The free tier limit has been reached. Check your Gemini API billing at aistudio.google.com.",
+  },
+  api_error: {
+    icon: "🔌",
+    title: "Service unavailable",
+    body: "Couldn't reach the weather service. Please try again in a moment.",
+  },
+  unknown: {
+    icon: "❌",
+    title: "Something went wrong",
+    body: "An unexpected error occurred. Please try again.",
+  },
+};
+
 // ── Icons ─────────────────────────────────────────────────────────────────────
 const IconCloud = () => (
   <svg
@@ -210,11 +228,40 @@ export default function WeatherChatWidget() {
             ) : (
               <>
                 {messages.map((msg, i) => (
-                  <div key={i} className={`wcw-msg-row ${msg.role}`}>
+                  <div key={`msg-${i}`} className={`wcw-msg-row ${msg.role}`}>
                     <div className="wcw-msg-label">
                       {msg.role === "user" ? "You" : "Assistant"}
                     </div>
-                    <div className="wcw-bubble">{msg.content}</div>
+
+                    {msg.error ? (
+                      // ── Error bubble ──────────────────────────────
+                      <div className="wcw-error-bubble">
+                        <div className="wcw-error-icon">
+                          {ERROR_MESSAGES[msg.error]?.icon ?? "❌"}
+                        </div>
+                        <div className="wcw-error-body">
+                          <div className="wcw-error-title">
+                            {ERROR_MESSAGES[msg.error]?.title}
+                          </div>
+                          <div className="wcw-error-text">
+                            {ERROR_MESSAGES[msg.error]?.body}
+                          </div>
+                          {msg.error === "quota_exceeded" && (
+                            <a
+                              className="wcw-error-link"
+                              href="https://aistudio.google.com"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              aistudio.google.com →
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      // ── Normal bubble ─────────────────────────────
+                      <div className="wcw-bubble">{msg.content}</div>
+                    )}
                   </div>
                 ))}
 

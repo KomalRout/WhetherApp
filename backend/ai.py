@@ -4,6 +4,12 @@ from google.genai import types
 from geocode import geocode
 from weather import get_weather, get_hourly
 from gemini_client import client
+from google.genai import errors as genai_errors
+
+# ── Custom exceptions ──────────────────────────────────────────────────────────
+class QuotaExceededError(Exception):
+    pass
+
 
 MODEL = "gemini-2.5-flash"
 
@@ -140,94 +146,110 @@ def _build_history(session_history: list) -> list:
     return contents
 
 async def run_agent(session_history: list, user_message: str) -> str:
-    contents = _build_history(session_history)
-    contents.append(types.Content(
-        role="user",
-        parts=[types.Part(text=user_message)]
-    ))
+    try:
+        contents = _build_history(session_history)
+        contents.append(types.Content(
+            role="user",
+            parts=[types.Part(text=user_message)]
+        ))
 
-    config = types.GenerateContentConfig(
-        system_instruction=SYSTEM,
-        tools=[TOOLS],
-        temperature=0.3,
-    )
-
-    # Agentic loop
-    while True:
-        response = client.models.generate_content(
-            model=MODEL,
-            contents=contents,
-            config=config,
+        config = types.GenerateContentConfig(
+            system_instruction=SYSTEM,
+            tools=[TOOLS],
+            temperature=0.3,
         )
 
-        candidate = response.candidates[0]
-        contents.append(candidate.content)  # append model turn
-
-        # Check if any part is a function call
-        tool_calls = [p for p in candidate.content.parts if p.function_call]
-
-        if not tool_calls:
-            # No tool calls — extract text and return
-            return next(
-                (p.text for p in candidate.content.parts if hasattr(p, "text") and p.text),
-                "I couldn't generate a response."
+        # Agentic loop
+        while True:
+            response = client.models.generate_content(
+                model=MODEL,
+                contents=contents,
+                config=config,
             )
 
-        # Execute all tool calls in parallel
-        tool_results = await asyncio.gather(*[
-            dispatch_tool(p.function_call.name, dict(p.function_call.args))
-            for p in tool_calls
-        ])
+            candidate = response.candidates[0]
+            contents.append(candidate.content)  # append model turn
 
-        # Build function response parts
-        response_parts = [
-            types.Part(function_response=types.FunctionResponse(
-                name=tool_calls[i].function_call.name,
-                response={"result": tool_results[i]},
-            ))
-            for i in range(len(tool_calls))
-        ]
+            # Check if any part is a function call
+            tool_calls = [p for p in candidate.content.parts if p.function_call]
 
-        # Append tool results and loop
-        contents.append(types.Content(role="user", parts=response_parts))
+            if not tool_calls:
+                # No tool calls — extract text and return
+                return next(
+                    (p.text for p in candidate.content.parts if hasattr(p, "text") and p.text),
+                    "I couldn't generate a response."
+                )
+
+            # Execute all tool calls in parallel
+            tool_results = await asyncio.gather(*[
+                dispatch_tool(p.function_call.name, dict(p.function_call.args))
+                for p in tool_calls
+            ])
+
+            # Build function response parts
+            response_parts = [
+                types.Part(function_response=types.FunctionResponse(
+                    name=tool_calls[i].function_call.name,
+                    response={"result": tool_results[i]},
+                ))
+                for i in range(len(tool_calls))
+            ]
+
+            # Append tool results and loop
+            contents.append(types.Content(role="user", parts=response_parts))
+    except genai_errors.ClientError as e:
+        if "429" in str(e) or "quota" in str(e).lower() or "RESOURCE_EXHAUSTED" in str(e):
+            raise QuotaExceededError()
+        raise
+    except Exception as e:
+        raise
 
 
 async def run_agent_stream(session_history: list, user_message: str, session_id: str):
-    from memory_store import store
-    contents = _build_history(session_history)
-    contents.append(types.Content(role="user", parts=[types.Part(text=user_message)]))
-    config = types.GenerateContentConfig(system_instruction=SYSTEM, tools=[TOOLS], temperature=0.3)
+    try:
+        from memory_store import store
+        contents = _build_history(session_history)
+        contents.append(types.Content(role="user", parts=[types.Part(text=user_message)]))
+        config = types.GenerateContentConfig(system_instruction=SYSTEM, tools=[TOOLS], temperature=0.3)
 
-    while True:
-        response = client.models.generate_content(model=MODEL, contents=contents, config=config)
-        candidate = response.candidates[0]
-        contents.append(candidate.content)
+        while True:
+            response = client.models.generate_content(model=MODEL, contents=contents, config=config)
+            candidate = response.candidates[0]
+            contents.append(candidate.content)
 
-        tool_calls = [p for p in candidate.content.parts if p.function_call]
+            tool_calls = [p for p in candidate.content.parts if p.function_call]
 
-        if not tool_calls:
-            text = next((p.text for p in candidate.content.parts if hasattr(p, "text") and p.text), "")
-            store.add_message(session_id, "user", user_message)
-            store.add_message(session_id, "assistant", text)
-            yield {"type": "answer", "content": text}
-            return
+            if not tool_calls:
+                text = next((p.text for p in candidate.content.parts if hasattr(p, "text") and p.text), "")
+                store.add_message(session_id, "user", user_message)
+                store.add_message(session_id, "assistant", text)
+                yield {"type": "answer", "content": text}
+                return
 
-        # Stream each tool call status to frontend
-        results = []
-        for i, part in enumerate(tool_calls):
-            name = part.function_call.name
-            args = dict(part.function_call.args)
-            yield {"type": "tool_call", "tool": name, "input": args}
+            # Stream each tool call status to frontend
+            results = []
+            for i, part in enumerate(tool_calls):
+                name = part.function_call.name
+                args = dict(part.function_call.args)
+                yield {"type": "tool_call", "tool": name, "input": args}
 
-            result = await dispatch_tool(name, args)
-            yield {"type": "tool_result", "tool": name, "ok": "error" not in result}
-            results.append(result)
+                result = await dispatch_tool(name, args)
+                yield {"type": "tool_result", "tool": name, "ok": "error" not in result}
+                results.append(result)
 
-        response_parts = [
-            types.Part(function_response=types.FunctionResponse(
-                name=tool_calls[i].function_call.name,
-                response={"result": results[i]},
-            ))
-            for i in range(len(tool_calls))
-        ]
-        contents.append(types.Content(role="user", parts=response_parts))
+            response_parts = [
+                types.Part(function_response=types.FunctionResponse(
+                    name=tool_calls[i].function_call.name,
+                    response={"result": results[i]},
+                ))
+                for i in range(len(tool_calls))
+            ]
+            contents.append(types.Content(role="user", parts=response_parts))
+    except genai_errors.ClientError as e:
+        if "429" in str(e) or "quota" in str(e).lower() or "RESOURCE_EXHAUSTED" in str(e):
+            yield {"type": "error", "code": "quota_exceeded"}
+        else:
+            yield {"type": "error", "code": "api_error", "message": str(e)}
+
+    except Exception as e:
+        yield {"type": "error", "code": "unknown", "message": str(e)}
