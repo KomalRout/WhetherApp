@@ -36,6 +36,15 @@ The app includes a backend powered by FastAPI that handles the AI weather assist
 It uses Google Gemini for agent orchestration and Open-Meteo tools for real weather and forecast data.
 The backend exposes endpoints for streaming chat responses and session history management.
 
+The backend is deployed on render.com and serves the live chat API used by the frontend.
+
+## Live Demo
+
+- Frontend: https://komalrout.github.io/Weather_App/
+- Backend docs / API: https://weather-app-6upu.onrender.com/docs#/
+
+The frontend chat widget is configured to use the deployed backend service by default.
+
 ## Installation
 
 1. Clone the repository:
