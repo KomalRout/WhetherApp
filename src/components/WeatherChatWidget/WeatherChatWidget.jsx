@@ -12,8 +12,9 @@ const SUGGESTIONS = [
 const ERROR_MESSAGES = {
   quota_exceeded: {
     icon: "⚠️",
-    title: "API quota exceeded",
-    body: "The free tier limit has been reached. Check your Gemini API billing at aistudio.google.com.",
+    title: "Daily limit reached",
+    body: "I've hit my free tier quota for today. Come back tomorrow and I'll be ready to help again!",
+    hint: "Resets daily at midnight Pacific Time.",
   },
   api_error: {
     icon: "🔌",
@@ -24,6 +25,7 @@ const ERROR_MESSAGES = {
     icon: "❌",
     title: "Something went wrong",
     body: "An unexpected error occurred. Please try again.",
+    hint: "If this issue persists, please contact support.",
   },
 };
 
