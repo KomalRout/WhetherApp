@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import "./WeatherChatWidget.css";
+import "./weatherChatWidget.css";
 import { useWeatherAgent } from "../../hooks/useWeatherAgent";
 
 const SUGGESTIONS = [
