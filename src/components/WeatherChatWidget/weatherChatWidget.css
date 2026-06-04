@@ -572,3 +572,9 @@
 .wcw-error-link:hover {
   text-decoration: underline;
 }
+.wcw-error-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 5px;
+  font-family: var(--font-mono);
+}

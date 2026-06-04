@@ -248,6 +248,9 @@ export default function WeatherChatWidget() {
                           <div className="wcw-error-text">
                             {ERROR_MESSAGES[msg.error]?.body}
                           </div>
+                          <div className="wcw-error-hint">
+                            {ERROR_MESSAGES.quota_exceeded.hint}
+                          </div>
                           {msg.error === "quota_exceeded" && (
                             <a
                               className="wcw-error-link"
@@ -255,7 +258,7 @@ export default function WeatherChatWidget() {
                               target="_blank"
                               rel="noreferrer"
                             >
-                              aistudio.google.com →
+                              Check Gemini API billing →
                             </a>
                           )}
                         </div>
