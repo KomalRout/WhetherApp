@@ -17,18 +17,28 @@ A responsive weather dashboard built with React and Vite. Search for locations, 
 - **Weather assistant chat widget** for natural language weather queries and suggestions.
 - **Responsive design** optimized for desktop and mobile.
 
-## Technologies Used
+## Key Highlights
 
-- React 19
-- Python
-- Vite
-- Redux Toolkit
-- Axios
-- Open-Meteo API
-- LocationIQ reverse geocoding
-- FastAPI backend service
-- Google Gemini agent integration
-- MUI icons and Emotion styling utilities
+- 💬 Floating chat widget with a ChatGPT-like UI
+- 🤖 Agentic AI powered by Gemini 2.0 Flash with multi-step tool calling
+- 🌍 Real-time weather via Open-Meteo (no API key needed)
+- 📍 Geocoding via Nominatim / OpenStreetMap (no API key needed)
+- 🧠 In-memory conversation history with session management and TTL eviction
+- 📡 Streaming responses via Server-Sent Events (SSE)
+- 🔍 Live agent step visibility ("Fetching weather for Mumbai...")
+- ⚡ 7-day forecast, hourly breakdown, city comparisons, severe weather alerts
+- ⚠️ Graceful error handling for quota limits and network failures
+
+## Tech Stack
+
+- Frontend: React 19, Vite, Redux Toolkit, MUI, Emotion
+- Backend: Python, FastAPI, Uvicorn
+- AI & agent orchestration: Google Gemini 2.0 Flash
+- Weather data: Open-Meteo API (no API key required)
+- Geocoding: Nominatim / OpenStreetMap + LocationIQ reverse geocoding
+- HTTP: Axios, Server-Sent Events (SSE)
+- Local persistence: browser localStorage for saved locations
+- Dev tooling: GitHub Pages for frontend deployment, Render.com for backend deployment
 
 ## Backend Service
 
