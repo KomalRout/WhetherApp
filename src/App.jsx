@@ -20,7 +20,7 @@ import logo from "/assets/images/logo.svg";
 import saved from "/assets/images/icon-saved.svg";
 import units from "/assets/images/icon-units.svg";
 import HourlyForcastList from "./components/HourlyForcast/HourlyForcastList";
-//import ChatbotFloatingIcon from "./components/Chatbot/ChatbotFloatingIcon";
+import WeatherChatWidget from "./components/WeatherChatWidget/WeatherChatWidget";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -281,7 +281,11 @@ const App = () => {
                           ? dailyForcast
                           : Array.from({ length: 7 })
                         ).map((daily, index) => (
-                          <DailyForcastList daily={daily} index={index} />
+                          <DailyForcastList
+                            key={`daily-forcast-${index}`}
+                            daily={daily}
+                            index={index}
+                          />
                         ))}
                       </div>
                     </div>
@@ -335,7 +339,7 @@ const App = () => {
           />
         )}
       </div>
-      {/* {<ChatbotFloatingIcon />} */}
+      {<WeatherChatWidget />}
     </>
   );
 };

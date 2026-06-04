@@ -91,3 +91,15 @@ export const daysOfWeek = [
     label: "Sunday",
   },
 ];
+
+export const ai_Data = {
+  parsed: {
+    location: "Paris",
+    date: null,
+    intent: "general",
+    weather_type: null,
+    activity: null,
+  },
+  reply:
+    "Hello there! Let's check the weather for Paris.\n\nI have the forecast starting from **Sunday, March 8th, 2026**.\n\nFor **today, March 8th**, you can expect a mild day with temperatures ranging from a low of **7.5°C** to a high of **17.4°C**. There's a very low chance of rain, almost negligible (only 0.1mm is expected, with a 0% precipitation probability).\n\nLooking ahead, Monday (March 9th) and Tuesday (March 10th) will see similar mild conditions. However, things are set to change on **Wednesday, March 11th**. The temperature will drop quite a bit, with a high of **11.7°C**, and there's a much higher chance of rain, with an **88% probability** and 6.1mm expected.\n\nSo, mild for the start of the week, but prepare for cooler, wetter weather mid-week!",
+};
