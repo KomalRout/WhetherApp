@@ -180,7 +180,7 @@ export default function WeatherChatWidget() {
               <div className="wcw-header-name">Weather Assistant</div>
               <div className="wcw-header-status">
                 <div className="wcw-status-dot" />
-                {loading ? "Thinking…" : "Online · Gemini 2.0 Flash"}
+                {loading ? "Thinking…" : "Online · Gemini 2.5 Flash"}
               </div>
             </div>
             <div className="wcw-header-actions">

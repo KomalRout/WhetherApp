@@ -26,8 +26,15 @@ async def get_weather(lat: float, lon: float) -> dict:
         resp = await client.get(url, params=params)
         data = resp.json()
 
-    cur = data["current"]
-    daily = data["daily"]
+        # Guard against missing keys — API may return error object
+        if "error" in data or "current" not in data:
+            raise ValueError(f"Unexpected Open-Meteo response: {data}")
+    
+        cur = data["current"]
+        daily = data["daily"]
+
+        print("[weather] keys returned:", data.keys())
+        print("[weather] full response:", data) 
 
     return {
         # current snapshot
@@ -47,7 +54,7 @@ async def get_weather(lat: float, lon: float) -> dict:
                 "precip_probability": daily["precipitation_probability_max"][i],
                 "condition":         WMO_CODES.get(daily["weathercode"][i], "Unknown"),
             }
-            for i in range(7)
+            for i in range(len(daily["time"]))
         ],
     }
 

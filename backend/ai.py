@@ -79,42 +79,45 @@ TOOLS = types.Tool(function_declarations=[
 # ── Tool dispatcher ────────────────────────────────────────────────────────────
 
 async def dispatch_tool(name: str, args: dict) -> dict:
-    if name == "get_weather":
-        coords = await geocode(args["city"])
-        if not coords:
-            return {"error": f"Location not found: {args['city']}"}
-        data = await get_weather(coords["lat"], coords["lon"])
-        data["location"] = coords["name"]
-        return data
+    try:
+        if name == "get_weather":
+            coords = await geocode(args["city"])
+            if not coords:
+                return {"error": f"Location not found: {args['city']}"}
+            data = await get_weather(coords["lat"], coords["lon"])
+            data["location"] = coords["name"]
+            return data
 
-    if name == "compare_weather":
-        results = {}
-        for key in ("city_a", "city_b"):
-            coords = await geocode(args[key])
-            if coords:
-                w = await get_weather(coords["lat"], coords["lon"])
-                w["location"] = coords["name"]
-                results[key] = w
-            else:
-                results[key] = {"error": f"Not found: {args[key]}"}
-        return results
+        if name == "compare_weather":
+            results = {}
+            for key in ("city_a", "city_b"):
+                coords = await geocode(args[key])
+                if coords:
+                    w = await get_weather(coords["lat"], coords["lon"])
+                    w["location"] = coords["name"]
+                    results[key] = w
+                else:
+                    results[key] = {"error": f"Not found: {args[key]}"}
+            return results
 
-    if name == "get_hourly_forecast":
-        coords = await geocode(args["city"])
-        if not coords:
-            return {"error": f"Location not found: {args['city']}"}
-        return await get_hourly(coords["lat"], coords["lon"], args.get("hours", 12))
+        if name == "get_hourly_forecast":
+            coords = await geocode(args["city"])
+            if not coords:
+                return {"error": f"Location not found: {args['city']}"}
+            return await get_hourly(coords["lat"], coords["lon"], args.get("hours", 12))
 
-    if name == "check_alerts":
-        coords = await geocode(args["city"])
-        if not coords:
-            return {"error": f"Location not found: {args['city']}"}
-        # Open-Meteo doesn't have alerts — return a derived warning from weather data
-        data = await get_weather(coords["lat"], coords["lon"])
-        alerts = _derive_alerts(data)
-        return {"location": coords["name"], "alerts": alerts}
+        if name == "check_alerts":
+            coords = await geocode(args["city"])
+            if not coords:
+                return {"error": f"Location not found: {args['city']}"}
+            # Open-Meteo doesn't have alerts — return a derived warning from weather data
+            data = await get_weather(coords["lat"], coords["lon"])
+            alerts = _derive_alerts(data)
+            return {"location": coords["name"], "alerts": alerts}
 
-    return {"error": f"Unknown tool: {name}"}
+        return {"error": f"Unknown tool: {name}"}
+    except Exception as e:
+        return {"error": str(e)}
 
 
 def _derive_alerts(weather: dict) -> list[str]:
