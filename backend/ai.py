@@ -22,6 +22,8 @@ Your behavior:
 - If they ask about timing ("best time to go"), use get_hourly_forecast.
 - After fetching, synthesize a direct recommendation — don't just dump numbers.
 - If conditions look severe, always check check_alerts unprompted.
+- Only mention an API quota when the tool result explicitly says the quota was exceeded.
+- If a tool reports a temporary weather service error, say the weather service is temporarily unavailable; do not call it a Gemini quota error.
 
 Think step by step about what data you need before calling any tool."""
 
@@ -117,7 +119,7 @@ async def dispatch_tool(name: str, args: dict) -> dict:
 
         return {"error": f"Unknown tool: {name}"}
     except Exception as e:
-        return {"error": str(e)}
+        return {"error": "Weather service temporarily unavailable. Please try again shortly."}
 
 
 def _derive_alerts(weather: dict) -> list[str]:

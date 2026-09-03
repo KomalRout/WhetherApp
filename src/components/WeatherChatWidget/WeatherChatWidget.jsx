@@ -249,7 +249,7 @@ export default function WeatherChatWidget() {
                             {ERROR_MESSAGES[msg.error]?.body}
                           </div>
                           <div className="wcw-error-hint">
-                            {ERROR_MESSAGES.quota_exceeded.hint}
+                            {ERROR_MESSAGES[msg.error]?.hint}
                           </div>
                           {msg.error === "quota_exceeded" && (
                             <a
