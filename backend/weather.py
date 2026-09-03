@@ -1,4 +1,6 @@
 import httpx
+import asyncio
+import time
 
 WMO_CODES = {
     0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
@@ -9,8 +11,44 @@ WMO_CODES = {
     95: "Thunderstorm", 99: "Thunderstorm with hail",
 }
 
+_FORECAST_CACHE: dict[tuple[object, ...], tuple[float, dict]] = {}
+_CACHE_TTL_SECONDS = 300
+_REQUEST_TIMEOUT_SECONDS = 15
+
+
+async def _fetch_forecast(params: dict) -> dict:
+    cache_key = (
+        round(float(params["latitude"]), 3),
+        round(float(params["longitude"]), 3),
+        tuple(sorted(
+            (key, str(value))
+            for key, value in params.items()
+            if key not in ("latitude", "longitude")
+        )),
+    )
+    cached = _FORECAST_CACHE.get(cache_key)
+    if cached and time.monotonic() - cached[0] < _CACHE_TTL_SECONDS:
+        return cached[1]
+
+    last_error = None
+    for attempt in range(3):
+        try:
+            async with httpx.AsyncClient(timeout=_REQUEST_TIMEOUT_SECONDS) as client:
+                resp = await client.get("https://api.open-meteo.com/v1/forecast", params=params)
+                resp.raise_for_status()
+                data = resp.json()
+                if data.get("error"):
+                    raise ValueError(data.get("reason", "Open-Meteo returned an error"))
+                _FORECAST_CACHE[cache_key] = (time.monotonic(), data)
+                return data
+        except (httpx.HTTPError, ValueError) as exc:
+            last_error = exc
+            if attempt < 2:
+                await asyncio.sleep(2**attempt)
+    raise RuntimeError(f"Weather service request failed: {last_error}") from last_error
+
+
 async def get_weather(lat: float, lon: float) -> dict:
-    url = "https://api.open-meteo.com/v1/forecast"
     params = {
         "latitude": lat,
         "longitude": lon,
@@ -22,19 +60,11 @@ async def get_weather(lat: float, lon: float) -> dict:
         "timezone": "auto",
     }
 
-    async with httpx.AsyncClient() as client:
-        resp = await client.get(url, params=params)
-        data = resp.json()
-
-        # Guard against missing keys — API may return error object
-        if "error" in data or "current" not in data:
-            raise ValueError(f"Unexpected Open-Meteo response: {data}")
-    
-        cur = data["current"]
-        daily = data["daily"]
-
-        print("[weather] keys returned:", data.keys())
-        print("[weather] full response:", data) 
+    data = await _fetch_forecast(params)
+    if "current" not in data or "daily" not in data:
+        raise ValueError("Weather service returned an incomplete response")
+    cur = data["current"]
+    daily = data["daily"]
 
     return {
         # current snapshot
@@ -60,7 +90,6 @@ async def get_weather(lat: float, lon: float) -> dict:
 
 
 async def get_hourly(lat: float, lon: float, hours: int = 12) -> dict:
-    url = "https://api.open-meteo.com/v1/forecast"
     params = {
         "latitude": lat,
         "longitude": lon,
@@ -69,10 +98,9 @@ async def get_hourly(lat: float, lon: float, hours: int = 12) -> dict:
         "timezone": "auto",
     }
 
-    async with httpx.AsyncClient() as client:
-        resp = await client.get(url, params=params)
-        data = resp.json()
-
+    data = await _fetch_forecast(params)
+    if "hourly" not in data:
+        raise ValueError("Weather service returned an incomplete hourly response")
     hourly = data["hourly"]
     return {
         "hourly": [
