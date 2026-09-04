@@ -76,13 +76,18 @@ def _format_daily(forecasts: list[dict]) -> list[dict]:
     return [
         {
             "date": date,
-            "max_temp": max(item["main"]["temp_max"] for item in items),
-            "min_temp": min(item["main"]["temp_min"] for item in items),
+            "max": max(item["main"]["temp_max"] for item in items),
+            "min": min(item["main"]["temp_min"] for item in items),
             "rain_sum": sum(item.get("rain", {}).get("3h", 0) for item in items),
             "precip_probability": max(item.get("pop", 0) for item in items) * 100,
             "condition": _condition(max(items, key=lambda item: item["main"]["temp"])),
+            "humidity": round(sum(item["main"]["humidity"] for item in items) / len(items)),
+            "wind_speed": round(
+                max(item.get("wind", {}).get("speed", 0) for item in items) * 3.6,
+                1,
+            ),
         }
-        for date, items in days.items()
+        for date, items in list(days.items())[:5]
     ]
 
 
@@ -91,6 +96,7 @@ async def get_weather(lat: float, lon: float) -> dict:
     if "current" not in data or "forecast" not in data:
         raise ValueError("Weather service returned an incomplete response")
     return {
+        "type": "weather_card",
         "current": _format_current(data),
         "forecast": _format_daily(data["forecast"].get("list", [])),
     }

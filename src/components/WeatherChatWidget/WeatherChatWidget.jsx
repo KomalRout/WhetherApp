@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import "./weatherChatWidget.css";
 import { useWeatherAgent } from "../../hooks/useWeatherAgent";
+import WeatherCard from "./WeatherCard";
 
 const SUGGESTIONS = [
   "🌤  What's the weather in Mumbai right now?",
@@ -27,6 +28,16 @@ const ERROR_MESSAGES = {
     body: "An unexpected error occurred. Please try again.",
     hint: "If this issue persists, please contact support.",
   },
+};
+
+const parseAssistantContent = (content) => {
+  if (typeof content !== "string") return null;
+  try {
+    const parsed = JSON.parse(content);
+    return parsed?.type === "weather_card" ? parsed : null;
+  } catch {
+    return null;
+  }
 };
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
@@ -265,7 +276,23 @@ export default function WeatherChatWidget() {
                       </div>
                     ) : (
                       // ── Normal bubble ─────────────────────────────
-                      <div className="wcw-bubble">{msg.content}</div>
+                      parseAssistantContent(msg.content) ? (
+                        <div className="wcw-assistant-content">
+                          <WeatherCard weather={parseAssistantContent(msg.content)} />
+                          <div className="wcw-weather-summary">
+                            {parseAssistantContent(msg.content).summary}
+                          </div>
+                          <div className="wcw-followups">
+                            {["Will it rain this weekend?", "What about tomorrow?"].map((question) => (
+                              <button key={question} onClick={() => send(question)}>
+                                {question}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="wcw-bubble">{msg.content}</div>
+                      )
                     )}
                   </div>
                 ))}
