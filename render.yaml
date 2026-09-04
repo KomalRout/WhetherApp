@@ -8,3 +8,5 @@ services:
     envVars:
       - key: WEATHER_APP_GEMINI_API_KEY
         sync: false
+      - key: OPENWEATHERMAP_API_KEY
+        sync: false

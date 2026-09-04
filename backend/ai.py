@@ -112,7 +112,7 @@ async def dispatch_tool(name: str, args: dict) -> dict:
             coords = await geocode(args["city"])
             if not coords:
                 return {"error": f"Location not found: {args['city']}"}
-            # Open-Meteo doesn't have alerts — return a derived warning from weather data
+            # OpenWeatherMap's standard endpoints do not include alert data.
             data = await get_weather(coords["lat"], coords["lon"])
             alerts = _derive_alerts(data)
             return {"location": coords["name"], "alerts": alerts}
@@ -123,7 +123,7 @@ async def dispatch_tool(name: str, args: dict) -> dict:
 
 
 def _derive_alerts(weather: dict) -> list[str]:
-    """Derive simple alerts from weather data since Open-Meteo has no alert endpoint."""
+    """Derive simple alerts from the weather data available to the agent."""
     alerts = []
     cur = weather.get("current", {})
     if cur.get("wind_speed", 0) > 60:
@@ -133,8 +133,8 @@ def _derive_alerts(weather: dict) -> list[str]:
     if cur.get("temp", 20) < 0:
         alerts.append("Freezing conditions: temperature below 0°C")
     for day in weather.get("forecast", []):
-        if day.get("precipitation", 0) > 50:
-            alerts.append(f"Heavy rainfall warning on {day['date']}: {day['precipitation']}mm expected")
+        if day.get("rain_sum", 0) > 50:
+            alerts.append(f"Heavy rainfall warning on {day['date']}: {day['rain_sum']}mm expected")
     return alerts or ["No active alerts"]
 
 # ── Agentic loop ───────────────────────────────────────────────────────────────

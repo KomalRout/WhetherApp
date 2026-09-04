@@ -1,6 +1,8 @@
 # geocoding.py
 import asyncio
-import requests
+import os
+
+import httpx
 
 
 def _geocode_sync(city: str):
@@ -10,34 +12,32 @@ def _geocode_sync(city: str):
 
     city = city.strip()
 
-    url = "https://geocoding-api.open-meteo.com/v1/search"
+    api_key = os.getenv("OPENWEATHERMAP_API_KEY")
+    if not api_key:
+        raise RuntimeError("OPENWEATHERMAP_API_KEY is not configured")
 
     params = {
-        "name": city,
-        "count": 1,
-        "language": "en",
-        "format": "json"
+        "q": city,
+        "limit": 1,
+        "appid": api_key,
     }
 
     try:
-        res = requests.get(url, params=params, timeout=10)
+        with httpx.Client(timeout=10) as client:
+            response = client.get(
+                "https://api.openweathermap.org/geo/1.0/direct",
+                params=params,
+            )
+            response.raise_for_status()
+            results = response.json()
 
-        if res.status_code != 200:
-            print("❌ Geocode HTTP error:", res.status_code, res.text)
-            return None
-
-        data = res.json()
-
-        print("🌍 Geocode raw response:", data)   # DEBUG
-
-        if "results" not in data or not data["results"]:
+        if not results:
             print(f"❌ No geocoding results for: {city}")
             return None
 
-        loc = data["results"][0]
-
-        lat = loc.get("latitude")
-        lon = loc.get("longitude")
+        loc = results[0]
+        lat = loc.get("lat")
+        lon = loc.get("lon")
         name = loc.get("name") or city
 
         if lat is None or lon is None:
@@ -45,10 +45,8 @@ def _geocode_sync(city: str):
             return None
 
         print(f"✅ Geocoded {city} → lat={lat}, lon={lon}")
-
         return {"lat": lat, "lon": lon, "name": name}
-
-    except Exception as e:
+    except (httpx.HTTPError, ValueError, RuntimeError) as e:
         print("❌ Geocode exception:", e)
         return None
 

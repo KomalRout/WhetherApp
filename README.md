@@ -34,7 +34,7 @@ A responsive weather dashboard built with React and Vite. Search for locations, 
 - Frontend: React 19, Vite, Redux Toolkit, MUI, Emotion
 - Backend: Python, FastAPI, Uvicorn
 - AI & agent orchestration: Google Gemini 2.0 Flash
-- Weather data: Open-Meteo API (no API key required)
+- Weather data: OpenWeatherMap API
 - Geocoding: Nominatim / OpenStreetMap + LocationIQ reverse geocoding
 - HTTP: Axios, Server-Sent Events (SSE)
 - Local persistence: browser localStorage for saved locations
@@ -43,7 +43,7 @@ A responsive weather dashboard built with React and Vite. Search for locations, 
 ## Backend Service
 
 The app includes a backend powered by FastAPI that handles the AI weather assistant chat flow.
-It uses Google Gemini for agent orchestration and Open-Meteo tools for real weather and forecast data.
+It uses Google Gemini for agent orchestration and OpenWeatherMap tools for real weather and forecast data.
 The backend exposes endpoints for streaming chat responses and session history management.
 
 The backend is deployed on render.com and serves the live chat API used by the frontend.
@@ -94,6 +94,7 @@ The frontend chat widget is configured to use the deployed backend service by de
 
    ```bash
    WEATHER_APP_GEMINI_API_KEY=your_google_gemini_api_key
+   OPENWEATHERMAP_API_KEY=your_openweathermap_api_key
    ```
 
 6. Start the backend server:
